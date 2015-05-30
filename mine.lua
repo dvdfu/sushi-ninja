@@ -3,7 +3,7 @@ Vector = require 'lib.vector'
 
 Mine = Class{
 	init = function(self, id, x, y, player)
-		self.type = "MINE"
+		self.type = 'MINE'
 		self.id = id
 		self.pos = Vector(x, y)
 		self.player = player
@@ -20,7 +20,7 @@ end
 
 function Mine:draw()
   love.graphics.setColor(0, 0, 0, 255)
-  love.graphics.circle("fill", self.body:getX(), self.body:getY(), self.shape:getRadius())
+  love.graphics.circle('fill', self.body:getX(), self.body:getY(), self.shape:getRadius())
   love.graphics.setColor(255, 255, 255, 255)
 end
 
