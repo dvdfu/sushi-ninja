@@ -5,7 +5,6 @@ Controller = require 'controller'
 Player = Class {
 	SPEED = 5,
 	CURSOR_RADIUS = 80,
-	PI = 3.14159265358,
 	ROTATION_FACTOR = 0.25,
 	BLUR_SPR = love.graphics.newImage('img/blur.png'),
 	init = function(self, playerNum)
@@ -42,9 +41,9 @@ function Player:update(dt)
 		print(angle)
 	    -- Did the angle flip from +Pi to -Pi, or -Pi to +Pi?
 	    if self.lastAngle < -2.0 and angle > 2.0 then
-	        self.cursorAngle = self.cursorAngle + (Player.PI*2.0)
+	        self.cursorAngle = self.cursorAngle + (math.pi*2.0)
 	    elseif self.lastAngle > 2.0 and angle < -2.0 then
-	        self.cursorAngle = self.cursorAngle - Player.PI * 2.0
+	        self.cursorAngle = self.cursorAngle - math.pi * 2.0
 	    end
 	 
 	    self.lastAngle = angle
