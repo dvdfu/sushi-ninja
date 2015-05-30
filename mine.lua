@@ -32,7 +32,7 @@ function Mine:explode()
 			return
 		end
 	end
-	for key, mine in pairs(self.mines) do mine:setId(key) end
+	for key, mine in pairs(self.player.mines) do mine:setId(key) end
 end
 
 function Mine:setId(id) self.id = id end
