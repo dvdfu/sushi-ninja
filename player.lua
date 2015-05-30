@@ -1,6 +1,7 @@
 Class = require 'lib.class'
 Vector = require 'lib.vector'
 Controller = require 'controller'
+Mine = require 'mine'
 
 Player = Class {
 	SPEED = 500,
@@ -8,6 +9,7 @@ Player = Class {
 	BLUR_TIMEOUT = 1 / 20,
  	ROTATION_FACTOR = 0.15,
 	init = function(self, playerNum)
+		self.type = "PLAYER"
 		self.id = playerNum
 		self.pos = Vector(playerNum*475, 420)
 		self.oldPos = self.pos
@@ -26,8 +28,14 @@ Player = Class {
 		self.body = love.physics.newBody(world, self.pos.x, self.pos.y, 'dynamic')
 		self.shape = love.physics.newCircleShape(16)
 		self.fixture = love.physics.newFixture(self.body, self.shape)
+		self.fixture:setUserData(self)
 
 		Player.BLUR_SPR:setFilter('nearest', 'nearest')
+
+		self.mines = {}
+		self.minesCount = 0
+		self.preT = 0
+
 	end
 }
 
@@ -79,10 +87,17 @@ function Player:update(dt)
 		end
 	end
 
+	if love.timer.getTime() - self.preT > 0.5 and self.controller:RT() == 1 then
+		self:dropMine()
+		self.preT = love.timer.getTime()
+	end
+
 	-- self.body:setPosition(self.pos.x, self.pos.y)
 end
 
 function Player:draw()
+	for key, mine in pairs(self.mines) do mine:draw() end
+
 	love.graphics.circle("fill", self.body:getX(), self.body:getY(), self.shape:getRadius())
 
 	if self.cursorTimer > 0 then
@@ -101,6 +116,19 @@ function Player:draw()
 	end
 
 	-- love.graphics.circle('fill', self.pos.x, self.pos.y, 16)
+end
+
+function Player:dropMine()
+	self.minesCount = self.minesCount + 1
+	if self.minesCount > 5 then
+		self.mines[5]:explode()
+	end
+	table.insert(self.mines, 1, Mine(1, self.pos.x, self.pos.y, self))
+	for key, mine in pairs(self.mines) do mine:setId(key) end
+end
+
+function Player:getMines()
+	return self.mines
 end
 
 return Player
