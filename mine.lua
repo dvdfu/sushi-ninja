@@ -8,9 +8,9 @@ Mine = Class{
 		self.pos = Vector(x, y)
 		self.player = player
 
-		self.body = love.physics.newBody(world, self.pos.x, self.pos.y, 'static')
+		self.body = love.physics.newBody(world, self.pos.x, self.pos.y, 'kinematic')
 		self.shape = love.physics.newCircleShape(5)
-		self.fixture = love.physics.newFixture(self.body, self.shape)
+		self.fixture = love.physics.newFixture(self.body, self.shape, 0)
 		self.fixture:setUserData(self)
 	end
 }
@@ -27,12 +27,12 @@ end
 function Mine:explode()
 	for key, mine in pairs(self.player.mines) do
 		if key == self.id then
-			table.remove(self.player.mines, key)
+			table.remove(self.player.mines, key).body:destroy()
 			self.player.minesCount = self.player.minesCount - 1
+			for key, mine in pairs(self.player.mines) do mine:setId(key) end
 			return
 		end
 	end
-	for key, mine in pairs(self.player.mines) do mine:setId(key) end
 end
 
 function Mine:setId(id) self.id = id end

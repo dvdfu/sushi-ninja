@@ -40,6 +40,7 @@ Player = Class {
 }
 
 function Player:update(dt)
+	for i = 1, #self.mines do self.mines[i]:setId(i) end
 	local lsx, lsy = self.controller:LSX(), self.controller:LSY()
 	local rsx, rsy = self.controller:RSX(), self.controller:RSY()
 

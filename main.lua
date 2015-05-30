@@ -33,7 +33,7 @@ function love.draw()
 end
 
 function beginContact(a, b, coll)
-	if a:getUserData().type == b:getUserData().type then end
+	if a:getUserData().type == b:getUserData().type then return end
 	local player
 	local mine
 	if a:getUserData().type == "PLAYER" then
@@ -43,18 +43,18 @@ function beginContact(a, b, coll)
 		player = b:getUserData()
 		mine = a:getUserData()
 	end
-	if player.id ~= mine.player.id then
-		print("PLAYER ", player.id, " TOUCHED ENEMY MINE ", mine.id)
-		mine:explode()
+	if player and mine then
+		if player.id ~= mine.player.id then
+			print("PLAYER ", player.id, " TOUCHED ENEMY MINE ", mine.id)
+			mine:explode()
+		end
 	end
 end
  
 function endContact(a, b, coll)
- 
 end
  
 function preSolve(a, b, coll)
- 
 end
  
 function postSolve(a, b, coll, normalimpulse1, tangentimpulse1, normalimpulse2, tangentimpulse2)
