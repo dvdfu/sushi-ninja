@@ -56,4 +56,18 @@ function Controller:LB()
 	return self.controller:isDown(self.lBumper)
 end
 
+function Controller:RT()
+	if self.controller == nil then return 0 end
+	local r = self.controller:getGamepadAxis('triggerright') or 0
+	if math.abs(r) > Controller.buffer then return r end
+	return 0
+end
+
+function Controller:LT()
+	if self.controller == nil then return 0 end
+	local l = self.controller:getGamepadAxis('triggerleft') or 0
+	if math.abs(l) > Controller.buffer then return l end
+	return 0
+end
+
 return Controller
