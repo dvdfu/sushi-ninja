@@ -13,7 +13,7 @@ function love.load()
 	p2 = Player(2)
 	c = Controller(1)
 	objSpawner = ObjSpawner()
-	objSpawner:addSpawn('coin', 3)
+	objSpawner:addSpawn('COIN', 3)
 end
 
 function love.update(dt)
@@ -33,30 +33,51 @@ function love.draw()
 end
 
 function beginContact(a, b, coll)
-	if a:getUserData().type == b:getUserData().type then return end
+	local PLAYER_TYPE = 'PLAYER'
+	local MINE_TYPE = 'MINE'
+	local COIN_TYPE = 'COIN'
+	local userDataA = a:getUserData()
+	local userDataB = b:getUserData()
+	if userDataA.type == userDataB.type then return end
 	local player
 	local mine
-	if a:getUserData().type == "PLAYER" then
-		player = a:getUserData()
-		mine = b:getUserData()
-	else
-		player = b:getUserData()
-		mine = a:getUserData()
+	local coin
+
+	if userDataA.type == PLAYER_TYPE then
+		player = userDataA
+	elseif userDataA.type == MINE_TYPE then
+		mine = userDataA
+	elseif userDataA.type == COIN_TYPE then
+		coin = userDataA
 	end
+
+	if userDataB.type == PLAYER_TYPE then
+		player = userDataB
+	elseif userDataA.type == MINE_TYPE then
+		mine = userDataB
+	elseif userDataA.type == COIN_TYPE then
+		coin = userDataB
+	end
+
 	if player and mine then
 		if player.id ~= mine.player.id then
 			print("PLAYER ", player.id, " TOUCHED ENEMY MINE ", mine.id)
 			mine:explode()
 		end
+	elseif player and coin then
+		player, coin = userDataA, userDataB
+		player:collectCoin(coin)
 	end
 end
- 
+
 function endContact(a, b, coll)
+
 end
- 
+
 function preSolve(a, b, coll)
+
 end
- 
+
 function postSolve(a, b, coll, normalimpulse1, tangentimpulse1, normalimpulse2, tangentimpulse2)
- 
+
 end

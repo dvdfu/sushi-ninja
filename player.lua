@@ -9,7 +9,7 @@ Player = Class {
 	BLUR_TIMEOUT = 1 / 20,
  	ROTATION_FACTOR = 0.15,
 	init = function(self, playerNum)
-		self.type = "PLAYER"
+		self.type = 'PLAYER'
 		self.id = playerNum
 		self.pos = Vector(playerNum*475, 420)
 		self.oldPos = self.pos
@@ -36,6 +36,7 @@ Player = Class {
 		self.minesCount = 0
 		self.preT = 0
 
+		self.coinCount = 0
 	end
 }
 
@@ -130,6 +131,11 @@ end
 
 function Player:getMines()
 	return self.mines
+end
+
+function Player:collectCoin()
+	self.coinCount = self.coinCount + 1
+	return self.coinCount
 end
 
 return Player
