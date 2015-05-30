@@ -10,11 +10,12 @@ function love.load()
 
 	p1 = Player(1)
 	c = Controller(1)
-  coinSpawner = ObjSpawner(10, 1, Coin)
+  coinSpawner = ObjSpawner(Coin.objType, 2)
 end
 
 function love.update(dt)
 	p1:update(dt)
+  coinSpawner:update(dt)
 	if love.keyboard.isDown('escape') then
 		love.event.push('quit')
 	end
@@ -22,5 +23,5 @@ end
 
 function love.draw()
 	p1:draw()
-  --coinSpawner:draw()
+  coinSpawner:draw()
 end
