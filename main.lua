@@ -4,12 +4,15 @@ function love.load()
 	math.randomseed(os.time())
 	love.graphics.setDefaultFilter('nearest', 'nearest')
 	love.graphics.setBackgroundColor(40, 60, 80)
+	love.physics.setMeter(64)
+	world = love.physics.newWorld(0, 0, true)
 
 	p1 = Player(1)
 	p2 = Player(2)
 end
 
 function love.update(dt)
+	world:update(dt)
 	p1:update(dt)
 	p2:update(dt)
 	if love.keyboard.isDown('escape') then
