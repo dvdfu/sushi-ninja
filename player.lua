@@ -6,16 +6,20 @@ Player = Class {
 	SPEED = 500,
 	BLUR_SPR = love.graphics.newImage('img/blur.png'),
 	BLUR_TIMEOUT = 1 / 20,
+ 	ROTATION_FACTOR = 0.15,
 	init = function(self, playerNum)
 		self.id = playerNum
 		self.pos = Vector(playerNum*475, 420)
 		self.oldPos = self.pos
 		self.vel = Vector(0, 0)
+
 		self.cursorAngle = 0
 		self.cursorRadius = 0
 		self.cursorVelocity = 0
 		self.cursor = false
 		self.cursorTimer = 0
+		self.cursorLastAngle = 0
+
 		self.coins = 0
 		self.controller = Controller(playerNum)
 
@@ -48,7 +52,16 @@ function Player:update(dt)
 	if self.cursor then
 		self.cursorVelocity = self.cursorVelocity * 0.95
 		self.cursorRadius = self.cursorRadius + self.cursorVelocity
-		self.cursorAngle = math.atan2(rsy, rsx)
+
+ 		local angle = math.atan2(rsy, rsx)
+ 	    if self.cursorLastAngle < -2.0 and angle > 2.0 then
+	        self.cursorAngle = self.cursorAngle + (math.pi*2.0)
+ 	    elseif self.cursorLastAngle > 2.0 and angle < -2.0 then
+	        self.cursorAngle = self.cursorAngle - math.pi * 2.0
+ 	    end
+ 	    self.cursorLastAngle = angle
+     	self.cursorAngle = (angle*Player.ROTATION_FACTOR) + (self.cursorAngle*(1.0 - Player.ROTATION_FACTOR))
+
 		if rsx == 0 and rsy == 0 then
 			self.cursor = false
 		elseif self.controller:RB() then
