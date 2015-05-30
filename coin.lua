@@ -3,9 +3,12 @@ Vector = require 'lib.vector'
 
 Coin = Class {
 	RADIUS = 5,
-	objType = 'coin',
+	INI_ID = 0,
+	OBJ_TYPE = 'coin',
 	init = function(self, pos)
 		self.pos = pos
+		self.id = Coin.INI_ID
+		Coin.INI_ID = Coin.INI_ID + 1
 	end
 }
 
