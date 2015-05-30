@@ -4,6 +4,8 @@ Controller = require 'controller'
 Player = Class {
 	SPEED = 5,
 	CURSOR_RADIUS = 80,
+	PI = 3.14159265358,
+	ROTATION_FACTOR = 0.2,
 	init = function(self, playerNum)
 		self.id = playerNum
 		self.x, self.y = 200, 200
@@ -12,6 +14,7 @@ Player = Class {
 		self.grappleActive = false
 		self.grappleX, self.grappleY = 0, 0
 		self.cursorAngle = 0
+		self.lastAngle = 0
 		self.controller = Controller(playerNum)
 	end
 }
@@ -24,11 +27,18 @@ function Player:update(dt)
 
 	controllerRSY = self.controller:RSY()
 	controllerRSX = self.controller:RSX()
-
 	if controllerRSY ~= 0 or controllerRSX ~= 0 then
-		local da = math.atan2(controllerRSY, controllerRSX) - self.cursorAngle
-		local a = (((da % 360) + 540) % 360) - 180
-		self.cursorAngle = self.cursorAngle + a / 4
+		local angle = math.atan2(controllerRSY, controllerRSX)
+		print(angle)
+	    -- Did the angle flip from +Pi to -Pi, or -Pi to +Pi?
+	    if self.lastAngle < -2.5 and angle > 2.5 then
+	        self.cursorAngle = self.cursorAngle + (Player.PI*2.0)
+	    elseif self.lastAngle > 2.5 and angle < -2.5 then
+	        self.cursorAngle = self.cursorAngle - Player.PI * 2.0
+	    end
+	 
+	    self.lastAngle = angle
+    	self.cursorAngle = (angle*Player.ROTATION_FACTOR) + (self.cursorAngle*(1.0 - Player.ROTATION_FACTOR))
 	end
 end
 
