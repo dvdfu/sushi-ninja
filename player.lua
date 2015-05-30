@@ -77,7 +77,4 @@ function Player:draw()
 	love.graphics.circle('fill', self.pos.x, self.pos.y, 16, 16)
 end
 
-function canMove()
-end
-
 return Player
