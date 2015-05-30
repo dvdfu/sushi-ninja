@@ -1,7 +1,7 @@
 Class = require 'lib.class'
 
 Controller = Class {
-	buffer = 0.08,
+	buffer = 0.1,
 	init = function(self, i)
 		self.num = i
 		self.controller = love.joystick.getJoysticks()[i]

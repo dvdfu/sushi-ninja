@@ -4,97 +4,77 @@ Controller = require 'controller'
 
 Player = Class {
 	SPEED = 5,
-	CURSOR_RADIUS = 80,
-	ROTATION_FACTOR = 0.25,
 	BLUR_SPR = love.graphics.newImage('img/blur.png'),
+	BLUR_TIMEOUT = 1 / 20,
 	init = function(self, playerNum)
 		self.id = playerNum
 		self.pos = Vector(playerNum*475, 420)
-		self.prePos = self.pos
+		self.oldPos = self.pos
 		self.vel = Vector(0, 0)
-		self.angle = 0
-		self.coins = 0
-		self.grappleActive = false
-		self.grappleCool = 0
-		self.grappleCoolMax = 0.5
-		self.gPos = self.pos
-		self.gVel = Vector(0, 0)
 		self.cursorAngle = 0
-		self.lastAngle = 0
+		self.cursorRadius = 0
+		self.cursorVelocity = 0
+		self.cursor = false
+		self.cursorTimer = 0
+		self.coins = 0
 		self.controller = Controller(playerNum)
 		Player.BLUR_SPR:setFilter('nearest', 'nearest')
 	end
 }
 
 function Player:update(dt)
+	local lsx, lsy = self.controller:LSX(), self.controller:LSY()
+	local rsx, rsy = self.controller:RSX(), self.controller:RSY()
+
 	self.vel = Vector(0, 0)
-	if self.grappleCool < self.grappleCoolMax - 0.1 then
+	if self.cursorTimer == 0 then
 		self.vel = self.vel + Vector(self.controller:LSX(), self.controller:LSY()) * Player.SPEED
 	end
 	self.pos = self.pos + self.vel
-	self.angle = math.atan2(self.controller:LSY(), self.controller:LSX())
 
-	local controllerRSY = self.controller:RSY()
-	local controllerRSX = self.controller:RSX()
-	if controllerRSY ~= 0 or controllerRSX ~= 0 then
-		local angle = math.atan2(controllerRSY, controllerRSX)
-		print(angle)
-	    -- Did the angle flip from +Pi to -Pi, or -Pi to +Pi?
-	    if self.lastAngle < -2.0 and angle > 2.0 then
-	        self.cursorAngle = self.cursorAngle + (math.pi*2.0)
-	    elseif self.lastAngle > 2.0 and angle < -2.0 then
-	        self.cursorAngle = self.cursorAngle - math.pi * 2.0
-	    end
-	 
-	    self.lastAngle = angle
-    	self.cursorAngle = (angle*Player.ROTATION_FACTOR) + (self.cursorAngle*(1.0 - Player.ROTATION_FACTOR))
-	end
-
-	--grapple logic
-	if self.grappleCool > 0 then
-		self.grappleCool = self.grappleCool - dt
+	--cursor logic
+	if self.cursorTimer > 0 then
+		self.cursorTimer = self.cursorTimer - dt
 	else
-		self.grappleCool = 0
+		self.cursorTimer = 0
 	end
 
-	if self.grappleActive then
-		self.gPos = self.gPos + self.gVel
-		self.gVel = self.gVel * 0.92
-		if not self.controller:RB() then
-			self.grappleActive = false
-			self.grappleCool = self.grappleCoolMax
-			self.prePos = self.pos
-			self.pos = self.gPos
+	if self.cursor then
+		self.cursorVelocity = self.cursorVelocity * 0.975
+		self.cursorRadius = self.cursorRadius + self.cursorVelocity
+		self.cursorAngle = math.atan2(rsy, rsx)
+		if rsx == 0 and rsy == 0 then
+			self.cursor = false
+		elseif self.controller:RB() then
+			self.cursor = false
+			self.cursorTimer = Player.BLUR_TIMEOUT
+			self.oldPos = self.pos
+			self.pos = self.pos + self.cursorRadius * Vector(math.cos(self.cursorAngle), math.sin(self.cursorAngle))
 		end
 	else
-		if self.controller:RB() then
-			self.grappleActive = true
-			self.gPos = self.pos
-			self.gVel = 24 * Vector(math.cos(self.angle), math.sin(self.angle))
+		if self.cursorTimer == 0 and not self.controller:RB() and (rsx ~= 0 or rsy ~= 0) then
+			self.cursor = true
+			self.cursorRadius = 0
+			self.cursorVelocity = 16
 		end
 	end
 end
 
 function Player:draw()
-	if self.grappleActive then
-		love.graphics.circle('fill', self.gPos.x, self.gPos.y, 5, 5)
-	end
-
-	if self.grappleCool > self.grappleCoolMax - 0.1 then
-		local grappleAngle = math.atan2(self.gPos.y - self.prePos.y, self.gPos.x - self.prePos.x)
-		local xScale = math.pow(self.gPos.y - self.prePos.y, 2) + math.pow(self.gPos.x - self.prePos.x, 2)
-		xScale = math.sqrt(xScale) / 64
+	if self.cursorTimer > 0 then
 		love.graphics.setBlendMode('additive')
-		local lerp = 10 * (self.grappleCool - self.grappleCoolMax + 0.1)
-		love.graphics.setColor(255, 255, 255, 255 * lerp)
-		love.graphics.draw(Player.BLUR_SPR, self.prePos.x, self.prePos.y, grappleAngle, xScale, 2, 0, 8)
+		love.graphics.setColor(255, 255, 255, 255 * (self.cursorTimer / Player.BLUR_TIMEOUT))
+		love.graphics.draw(Player.BLUR_SPR, self.oldPos.x, self.oldPos.y, self.cursorAngle, (self.cursorRadius + 16) / 128, 1, 0, 16)
 		love.graphics.setColor(255, 255, 255, 255)
 		love.graphics.setBlendMode('alpha')
 	end
 
+	if self.cursor then
+		local cursorPos = self.cursorRadius * Vector(math.cos(self.cursorAngle), math.sin(self.cursorAngle))
+		love.graphics.circle('fill', self.pos.x + cursorPos.x, self.pos.y + cursorPos.y, 5, 5)
+	end
+
 	love.graphics.circle('fill', self.pos.x, self.pos.y, 16, 16)
-	local cursor = Player.CURSOR_RADIUS * Vector(math.cos(self.cursorAngle), math.sin(self.cursorAngle))
-	-- love.graphics.circle('fill', self.pos.x + cursor.x, self.pos.y + cursor.y, 5, 5)
 end
 
 function canMove()
