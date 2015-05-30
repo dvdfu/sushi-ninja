@@ -1,7 +1,5 @@
 Player = require 'player'
-Controller = require 'controller'
 ObjSpawner = require 'obj_spawner'
-Coin = require 'coin'
 
 function love.load()
 	math.randomseed(os.time())
@@ -11,7 +9,7 @@ function love.load()
 	p1 = Player(1)
 	p2 = Player(2)
 	c = Controller(1)
-	coinSpawner = ObjSpawner(Coin.objType, 2)
+	coinSpawner = ObjSpawner('coin', 2)
 end
 
 function love.update(dt)
