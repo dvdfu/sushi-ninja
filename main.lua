@@ -12,8 +12,6 @@ end
 
 function love.update(dt)
 	p1:update(dt)
-	-- print(love.joystick.getJoystickCount())
-	print(c:LSX())
 end
 
 function love.draw()
