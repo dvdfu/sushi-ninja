@@ -3,7 +3,7 @@ Controller = require 'controller'
 
 Player = Class {
 	SPEED = 5,
-	CURSOR_RADIUS = 40,
+	CURSOR_RADIUS = 80,
 	init = function(self, playerNum)
 		self.id = playerNum
 		self.x, self.y = 200, 200
@@ -11,7 +11,7 @@ Player = Class {
 		self.coins = 0
 		self.grappleActive = false
 		self.grappleX, self.grappleY = 0, 0
-		self.cursorX, self.cursorY = 24, 24
+		self.cursorAngle = 0
 		self.controller = Controller(playerNum)
 	end
 }
@@ -26,15 +26,17 @@ function Player:update(dt)
 	controllerRSX = self.controller:RSX()
 
 	if controllerRSY ~= 0 or controllerRSX ~= 0 then
-		angle = math.atan2(controllerRSY, controllerRSX)
-		self.cursorX = Player.CURSOR_RADIUS * math.cos(angle)
-		self.cursorY = Player.CURSOR_RADIUS * math.sin(angle)
+		local da = math.atan2(controllerRSY, controllerRSX) - self.cursorAngle
+		local a = (((da % 360) + 540) % 360) - 180
+		self.cursorAngle = self.cursorAngle + a / 4
 	end
 end
 
 function Player:draw()
 	love.graphics.circle('fill', self.x, self.y, 16, 16)
-	love.graphics.circle('fill', self.x + self.cursorX, self.y + self.cursorY, 5, 5)
+	local cursorX = Player.CURSOR_RADIUS * math.cos(self.cursorAngle)
+	local cursorY = Player.CURSOR_RADIUS * math.sin(self.cursorAngle)
+	love.graphics.circle('fill', self.x + cursorX, self.y + cursorY, 5, 5)
 end
 
 return Player

@@ -5,9 +5,11 @@ Controller = Class {
 	init = function(self, i)
 		self.num = i
 		self.controller = love.joystick.getJoysticks()[i]
-		_, self.rBumper = self.controller:getGamepadMapping('rightshoulder')
-		_, self.lBumper = self.controller:getGamepadMapping('leftshoulder')
-		_, self.start = self.controller:getGamepadMapping('start')
+		if self.controller then
+			_, self.rBumper = self.controller:getGamepadMapping('rightshoulder')
+			_, self.lBumper = self.controller:getGamepadMapping('leftshoulder')
+			_, self.start = self.controller:getGamepadMapping('start')
+		end
 	end
 }
 
