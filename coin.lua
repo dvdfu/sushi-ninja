@@ -4,7 +4,8 @@ Vector = require 'lib.vector'
 Coin = Class {
 	RADIUS = 5,
 	INI_ID = 1,
-	SUSHI1_SPR = love.graphics.newImage('img/sushi2.png'),
+	SUSHI1_SPR = love.graphics.newImage('img/sushi1.png'),
+	SUSHI2_SPR = love.graphics.newImage('img/sushi2.png'),
 	init = function(self, pos)
 		self.type = OBJ_TYPE.COIN
 		self.pos = pos
@@ -17,7 +18,6 @@ Coin = Class {
 		self.fixture = love.physics.newFixture(self.body, self.shape)
 		self.fixture:setUserData(self)
 		self.fixture:setGroupIndex(CONSTANTS.PLAYER_COIN_FIXTURE_GROUP)
-		Coin.SUSHI1_SPR:setFilter('nearest', 'nearest')
 	end
 }
 

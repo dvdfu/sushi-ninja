@@ -11,6 +11,7 @@ Player = Class {
 	BLUR_SPR = love.graphics.newImage('img/blur.png'),
 	BLUR_TIMEOUT = 1 / 20,
  	ROTATION_FACTOR = 0.15,
+	DASH_SFX = love.audio.newSource("sfx/dash.wav"),
 	init = function(self, playerNum)
 		self.type = OBJ_TYPE.PLAYER
 		self.id = playerNum
@@ -36,10 +37,6 @@ Player = Class {
 		self.fixture:setCategory(self.id)
 		self.fixture:setMask(self.id)
 		self.fixture:setGroupIndex(CONSTANTS.PLAYER_COIN_FIXTURE_GROUP)
-
-		Player.BLUR_SPR:setFilter('nearest', 'nearest')
-		Player.IDLE_SPR:setFilter('nearest', 'nearest')
-		Player.RUN_SPR:setFilter('nearest', 'nearest')
 
  		self.idleAnim = newAnimation(Player.IDLE_SPR, 32, 32, 0.4, 0)
  		self.runAnim = newAnimation(Player.RUN_SPR, 32, 32, 0.1, 0)
@@ -92,7 +89,10 @@ function Player:update(dt)
      	self.cursorAngle = (angle*Player.ROTATION_FACTOR) + (self.cursorAngle*(1.0 - Player.ROTATION_FACTOR))
 
 		if rsx == 0 and rsy == 0 then self.cursor = false
+		--on dash
 		elseif self.controller:RB() then
+			Player.DASH_SFX:stop()
+			Player.DASH_SFX:play()
 			self.cursor = false
 			self.cursorTimer = Player.BLUR_TIMEOUT
 			self.oldPos = self.pos
