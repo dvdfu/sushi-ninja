@@ -43,6 +43,7 @@ end
 
 function Mine:explode(silent)
 	if not silent then
+		camShake = 0.3
 		Mine.EXPLOSION_SFX:stop()
 		Mine.EXPLOSION_SFX:play()
 

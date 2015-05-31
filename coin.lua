@@ -52,6 +52,8 @@ end
 function Coin:delete()
 	Coin.PICKUP_SFX:stop()
 	Coin.PICKUP_SFX:play()
+	partSparkle:setPosition(self.pos:unpack())
+	partSparkle:emit(20)
 	self.body:destroy()
 end
 

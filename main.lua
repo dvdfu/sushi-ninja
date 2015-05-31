@@ -5,6 +5,7 @@ ObjSpawner = require 'obj_spawner'
 Gamestate = require 'lib.gamestate'
 CONSTANTS = require 'constants'
 Controller = require 'controller'
+Camera = require "lib.camera"
 
 local menu = {}
 local game = {}
@@ -50,8 +51,21 @@ function game:enter()
 	partSmoke:setParticleLifetime(0, 0.5)
 	partSmoke:setSpread(math.pi * 2)
 	partSmoke:setSpeed(0, 200)
-	partSmoke:setColors(180, 180, 180, 255, 60, 60, 60, 255)
+	partSmoke:setColors(220, 220, 220, 255, 120, 120, 120, 255)
 	partSmoke:setSizes(3, 0)
+
+	particleSprite = love.graphics.newImage('img/sparkle.png')
+	partSparkle = love.graphics.newParticleSystem(particleSprite, 300)
+	partSparkle:setAreaSpread('normal', 4, 4)
+	partSparkle:setParticleLifetime(0, 0.5)
+	partSparkle:setDirection(-math.pi / 2)
+	partSparkle:setSpread(math.pi * 2)
+	partSparkle:setSpeed(0, 400)
+	partSparkle:setSizes(3, 1)
+
+	--camera
+	camShake = 0
+	cam = Camera(love.window.getWidth()/2, love.window.getHeight()/2)
 
 	love.physics.setMeter(64)
 	world = love.physics.newWorld(0, 0, true)
@@ -69,12 +83,21 @@ function game:update(dt)
 	world:update(dt)
 	partExplosion:update(dt)
 	partSmoke:update(dt)
+	partSparkle:update(dt)
 	p1:update(dt)
 	p2:update(dt)
 	objSpawner:update(dt)
+	if camShake > 0 then
+		cam:lookAt(love.window.getWidth()/2 + math.random(-1,1)*camShake*32, love.window.getHeight()/2 + math.random(-1,1)*camShake*32)
+		camShake = camShake - dt
+	else
+		cam:lookAt(love.window.getWidth()/2, love.window.getHeight()/2)
+		camShake = 0
+	end
 end
 
 function game:draw()
+	cam:attach()
 	p1:draw()
 	p2:draw()
 	objSpawner:draw()
@@ -89,9 +112,11 @@ function game:draw()
 			CONSTANTS.SCREEN_HEIGHT - CONSTANTS.Y_MARGIN)
 	end
 	love.graphics.draw(partSmoke)
+	love.graphics.draw(partSparkle)
 	love.graphics.setBlendMode('additive')
 	love.graphics.draw(partExplosion)
 	love.graphics.setBlendMode('alpha')
+	cam:detach()
 end
 
 -- function game:keypressed(key, code)
