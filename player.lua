@@ -135,6 +135,7 @@ end
 
 function Player:collectCoin()
 	self.coinCount = self.coinCount + 1
+	print(self.coinCount)
 	return self.coinCount
 end
 

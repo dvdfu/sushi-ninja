@@ -60,8 +60,9 @@ end
 
 -- Deletes a single item from a list of objects (e.g. coins)
 function ObjSpawner:deleteItem(obj)
-	objType = obj.TYPE
+	objType = obj.type
 	objId = obj.id
+	obj:delete()
 	self.objsToSpawn[objType][objId] = 0
 end
 return ObjSpawner

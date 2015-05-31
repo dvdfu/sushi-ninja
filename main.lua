@@ -48,7 +48,6 @@ function beginContact(a, b, coll)
 	elseif userDataA.type == MINE_TYPE then
 		mine = userDataA
 	elseif userDataA.type == COIN_TYPE then
-		print('coin is A')
 		coin = userDataA
 	end
 
@@ -57,7 +56,6 @@ function beginContact(a, b, coll)
 	elseif userDataB.type == MINE_TYPE then
 		mine = userDataB
 	elseif userDataB.type == COIN_TYPE then
-		print('coin is B')
 		coin = userDataB
 	end
 
@@ -67,7 +65,6 @@ function beginContact(a, b, coll)
 			mine:explode()
 		end
 	elseif player and coin then
-		print('got coin')
 		player:collectCoin(coin)
 		objSpawner:deleteItem(coin)
 	end
