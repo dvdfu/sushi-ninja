@@ -19,7 +19,8 @@ Player = Class {
 	init = function(self, playerNum)
 		self.type = OBJ_TYPE.PLAYER
 		self.id = playerNum
-		self.pos = Vector(playerNum*475, 420)
+		self.pos = Vector((playerNum * 2 - 1) * CONSTANTS.SCREEN_WIDTH / 4,
+			CONSTANTS.SCREEN_HEIGHT / 2)
 		self.oldPos = self.pos
 		self.vel = Vector(0, 0)
 		self.direction = 1
@@ -173,8 +174,7 @@ function Player:draw()
 end
 
 function Player:drawOffset(ox, oy)
-	if self.id == 1 then love.graphics.setColor(255, 255, 0)
-	else love.graphics.setColor(0, 255, 255) end
+	love.graphics.setColor(P_COLOUR[self.id].r, P_COLOUR[self.id].g, P_COLOUR[self.id].b)
 
 	local sWidth, sHeight = CONSTANTS.SCREEN_WIDTH, CONSTANTS.SCREEN_HEIGHT
 
@@ -208,8 +208,16 @@ function Player:dropMine()
 	for key, mine in pairs(self.mines) do mine:setId(key) end
 end
 
+function Player:getPos()
+	return self.pos
+end
+
 function Player:getMines()
 	return self.mines
+end
+
+function Player:getCoins()
+	return self.coins
 end
 
 function Player:collectCoin()
@@ -220,10 +228,6 @@ end
 
 function Player:setEnemy(enemy)
 	self.enemy = enemy
-end
-
-function Player:getCoins()
-	return self.coins
 end
 
 function Player:stun()
