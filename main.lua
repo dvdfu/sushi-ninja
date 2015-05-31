@@ -5,29 +5,106 @@ ObjSpawner = require 'obj_spawner'
 Gamestate = require 'lib.gamestate'
 CONSTANTS = require 'constants'
 Controller = require 'controller'
-Camera = require "lib.camera"
+Camera = require 'lib.camera'
+Vector = require 'lib.vector'
+Coin = require 'coin'
 
 local menu = {}
 local game = {}
 local pause = {}
 local over = {}
-
 local winTimer = 0
 
-function menu:draw()
-    love.graphics.setColor(255,255,255)
-    love.graphics.printf("Press START to play!", 0, CONSTANTS.SCREEN_HEIGHT/2, CONSTANTS.SCREEN_WIDTH, 'center')
+function menu:enter()
+	font = love.graphics.getFont()
+	message = 'Press START to play!'
+	sushiTimer = 0
+
+	idlePlayerAnim = newAnimation(Player.IDLE_SPR, 32, 32, 0.4, 0)
+	menuCoins = {{}, {}}
+	local sWidth, sHeight = CONSTANTS.SCREEN_WIDTH, CONSTANTS.SCREEN_HEIGHT
+	for i = 1, 20 do
+		for id in pairs(menuCoins) do
+			local sprite = Coin.SUSHI_SPR[math.random(#Coin.SUSHI_SPR)]
+			local posX = i * sWidth / 20
+			local posY = (id * 3 - 2) * sHeight / 5
+			spriteData = {
+				spr = sprite,
+				pos = Vector(posX, posY)
+			}
+			menuCoins[id][i] = spriteData
+		end
+	end
+
+	particleSprite = love.graphics.newImage('img/particle.png')
+	genPartSmoke()
 end
 
--- function menu:keyreleased(key, code)
---     if key == 'enter' or key == 'return' then
---         Gamestate.switch(game)
---     end
--- end
+function menu:update(dt)
+	local sWidth, sHeight = CONSTANTS.SCREEN_WIDTH, CONSTANTS.SCREEN_HEIGHT
+	idlePlayerAnim:update(dt)
+	if sushiTimer < 1 then
+		sushiTimer = sushiTimer + dt*0.7
+	else
+		sushiTimer = sushiTimer - 1
+	end
+
+	for id in pairs(menuCoins) do
+		for i = 1, 20 do
+			direction = (id * 2) - 3
+			print('DIRECTION: ', direction)
+			menuCoins[id][i].pos.x = menuCoins[id][i].pos.x + (direction * 5)
+			if menuCoins[id][i].pos.x < 0 then
+				menuCoins[id][i].pos.x = menuCoins[id][i].pos.x + sWidth
+			elseif menuCoins[id][i].pos.x > sWidth then
+				menuCoins[id][i].pos.x = menuCoins[id][i].pos.x - sWidth
+			end
+		end
+	end
+
+end
+
+function menu:draw()
+	love.graphics.print(message, love.window.getWidth()/2 - font:getWidth(message)/2, love.window.getHeight()/2 - font:getHeight(message)/2)
+	for i = 1, CONSTANTS.NUM_PLAYERS do
+		love.graphics.setColor(P_COLOUR[i].r, P_COLOUR[i].g, P_COLOUR[i].b)
+		idlePlayerAnim:draw((i * 2 - 1) * CONSTANTS.SCREEN_WIDTH / 4,
+			CONSTANTS.SCREEN_HEIGHT / 2, 0, 2, 2, 16, 16)
+	end
+
+	for id in pairs(menuCoins) do
+		for i = 1, 20 do
+			local spr = menuCoins[id][i].spr
+			local pos = menuCoins[id][i].pos
+			love.graphics.setColor(0, 0, 0, 128)
+			love.graphics.draw(Coin.SHADOW_SPR, pos.x, pos.y+8, 0, 2, 2, 16, 16)
+			love.graphics.setColor(255, 255, 255, 255)
+			love.graphics.draw(spr, pos.x, pos.y + 4 * math.sin(sushiTimer * math.pi * 2), 0, 2, 2, 16, 16)
+		end
+	end
+
+	love.graphics.setColor(255, 255, 255)
+end
+
+function menu:leave()
+	for id in pairs(menuCoins) do
+		for i = 1, 20 do
+			menuCoins[id][i] = nil
+		end
+		menuCoins[id] = nil
+	end
+	menuCoins = nil
+end
+
+function menu:keyreleased(key, code)
+    if key == 'enter' or key == 'return' then
+        Gamestate.switch(game)
+    end
+end
 
 function menu:joystickreleased(key, code)
 	if code == 9 then
-        Gamestate.switch(game)
+		Gamestate.switch(game)
 	end
 end
 
@@ -43,33 +120,10 @@ function game:enter()
 	UI_MARGIN = 40
 
 	--particle generators
-	local particleSprite = love.graphics.newImage('img/particle.png')
-	partExplosion = love.graphics.newParticleSystem(particleSprite, 300)
-	partExplosion:setAreaSpread('normal', 4, 4)
-	partExplosion:setParticleLifetime(0, 1)
-	partExplosion:setDirection(-math.pi / 2)
-	partExplosion:setSpread(math.pi / 2)
-	partExplosion:setSpeed(100, 500)
-	partExplosion:setColors(255, 255, 255, 255, 255, 255, 0, 255, 255, 30, 0, 255, 255, 0, 0, 128)
-	partExplosion:setSizes(2, 0)
-	partExplosion:setLinearAcceleration(0, 500, 0, 1000)
+	particleSprite = love.graphics.newImage('img/particle.png')
 
-	partSmoke = love.graphics.newParticleSystem(particleSprite, 300)
-	partSmoke:setAreaSpread('normal', 4, 4)
-	partSmoke:setParticleLifetime(0, 0.5)
-	partSmoke:setSpread(math.pi * 2)
-	partSmoke:setSpeed(0, 200)
-	partSmoke:setColors(220, 220, 220, 255, 120, 120, 120, 255)
-	partSmoke:setSizes(3, 0)
-
-	particleSprite = love.graphics.newImage('img/sparkle.png')
-	partSparkle = love.graphics.newParticleSystem(particleSprite, 300)
-	partSparkle:setAreaSpread('normal', 4, 4)
-	partSparkle:setParticleLifetime(0, 0.5)
-	partSparkle:setDirection(-math.pi / 2)
-	partSparkle:setSpread(math.pi * 2)
-	partSparkle:setSpeed(0, 400)
-	partSparkle:setSizes(3, 1)
+	genPartExplosion()
+	genPartSparkle()
 
 	--camera
 	camShake = 0
@@ -77,7 +131,7 @@ function game:enter()
 
 	love.physics.setMeter(64)
 	world = love.physics.newWorld(0, 0, true)
-    world:setCallbacks(beginContact, endContact, preSolve, postSolve)
+			world:setCallbacks(beginContact, endContact, preSolve, postSolve)
 
 	p1 = Player(1)
 	p2 = Player(2)
@@ -247,6 +301,39 @@ function love.keypressed(key)
 	if key == 'escape' then
     	love.event.push('quit')
     end
+end
+
+function genPartExplosion()
+	partExplosion = love.graphics.newParticleSystem(particleSprite, 300)
+	partExplosion:setAreaSpread('normal', 4, 4)
+	partExplosion:setParticleLifetime(0, 1)
+	partExplosion:setDirection(-math.pi / 2)
+	partExplosion:setSpread(math.pi / 2)
+	partExplosion:setSpeed(100, 500)
+	partExplosion:setColors(255, 255, 255, 255, 255, 255, 0, 255, 255, 30, 0, 255, 255, 0, 0, 128)
+	partExplosion:setSizes(2, 0)
+	partExplosion:setLinearAcceleration(0, 500, 0, 1000)
+end
+
+function genPartSmoke()
+	partSmoke = love.graphics.newParticleSystem(particleSprite, 300)
+	partSmoke:setAreaSpread('normal', 4, 4)
+	partSmoke:setParticleLifetime(0, 0.5)
+	partSmoke:setSpread(math.pi * 2)
+	partSmoke:setSpeed(0, 200)
+	partSmoke:setColors(220, 220, 220, 255, 120, 120, 120, 255)
+	partSmoke:setSizes(3, 0)
+end
+
+function genPartSparkle()
+	particleSprite = love.graphics.newImage('img/sparkle.png')
+	partSparkle = love.graphics.newParticleSystem(particleSprite, 300)
+	partSparkle:setAreaSpread('normal', 4, 4)
+	partSparkle:setParticleLifetime(0, 0.5)
+	partSparkle:setDirection(-math.pi / 2)
+	partSparkle:setSpread(math.pi * 2)
+	partSparkle:setSpeed(0, 400)
+	partSparkle:setSizes(3, 1)
 end
 
 function beginContact(a, b, coll)

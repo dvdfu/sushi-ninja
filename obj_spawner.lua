@@ -51,10 +51,24 @@ end
 
 function ObjSpawner:spawnObj(objType)
 	if self.objTableSizes[objType] ~= nil and self.objTableSizes[objType] >= self.objTableMaxSizes[objType] then return end
-	-- Place randomly on map
-	local xPos = math.random() * self.xBound + (CONSTANTS.X_MARGIN / 2)
-	local yPos = math.random() * self.yBound + (CONSTANTS.Y_MARGIN / 2)
-	local objPos = Vector(xPos, yPos)
+	local p1Pos, p2Pos = p1:getPos(), p2:getPos()
+
+	local distToP = {}
+	local objPos
+	local objTooCloseToP = true
+	while objTooCloseToP do
+		objPos = self:genRandPos()
+		-- Place randomly on map
+		distToP[1] = math.abs((objPos - p1.pos):len2())
+		distToP[2] = math.abs((objPos - p2.pos):len2())
+		objTooCloseToP = false
+		for pId, dist in pairs(distToP) do
+			if dist < CONSTANTS.MIN_COIN_DIST2_FROM_PLAYER then
+				objTooCloseToP = true
+			end
+		end
+	end
+
 	-- Determine which object to create.
 	if objType == OBJ_TYPE.COIN then
 		obj = Coin(objPos)
@@ -98,4 +112,11 @@ function ObjSpawner:deleteItem(obj)
 		self.objTableSizes[objType] = self.objTableSizes[objType] - 1
 	end
 end
+
+function ObjSpawner:genRandPos()
+	local xPos = math.random() * self.xBound + (CONSTANTS.X_MARGIN / 2)
+	local yPos = math.random() * self.yBound + (CONSTANTS.Y_MARGIN / 2)
+	return Vector(xPos, yPos)
+end
+
 return ObjSpawner
