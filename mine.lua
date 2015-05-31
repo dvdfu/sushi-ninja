@@ -24,7 +24,7 @@ Mine = Class{
 		self.fixture:setUserData(self)
 		self.fixture:setCategory(self.player.id)
 		self.fixture:setMask(self.player.id)
-
+		self.fixture:setSensor(true)
 		self.sprite = Coin.SUSHI_SPR[math.random(#Coin.SUSHI_SPR)]
 		Mine.PLANT_SFX:stop()
 		Mine.PLANT_SFX:play()
