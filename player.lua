@@ -256,6 +256,10 @@ function Player:isSpiced()
 	return self.wasabiTimer > 0
 end
 
+function Player:isSpiced()
+	return self.wasabiTimer > 0
+end
+
 function Player:stun()
 	if self.stunTimer == 0 then self.stunTimer = 2 end
 end
