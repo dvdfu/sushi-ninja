@@ -23,7 +23,6 @@ Coin = Class {
 		self.fixture = love.physics.newFixture(self.body, self.shape)
 		self.fixture:setUserData(self)
 		self.fixture:setGroupIndex(CONSTANTS.PLAYER_COIN_FIXTURE_GROUP)
-		Coin.SUSHI1_SPR:setFilter('nearest', 'nearest')
 	end
 }
 
