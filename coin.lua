@@ -43,6 +43,10 @@ function Coin:update(dt)
 	end
 end
 
+function Coin:menuUpdate(dt)
+
+end
+
 function Coin:draw()
 	love.graphics.setColor(0, 0, 0, 128)
 	love.graphics.draw(Coin.SHADOW_SPR, self.pos.x, self.pos.y+8, 0, 2, 2, 16, 16)

@@ -13,63 +13,65 @@ local pause = {}
 local over = {}
 
 function menu:enter()
-    font = love.graphics.getFont()
-    message = "Press START to play!"
+	font = love.graphics.getFont()
+	message = "Press START to play!"
+	world = love.physics.newWorld(0, 0, true)
+    world:setCallbacks(beginContact, endContact, preSolve, postSolve)
+	p1 = Player(1)
+	p2 = Player(2)
+
+	particleSprite = love.graphics.newImage('img/particle.png')
+	genPartSmoke()
+
+	menuObjSpawner = ObjSpawner()
+	menuObjSpawner:addSpawn(OBJ_TYPE.COIN, 1.0/60, 50, 50)
+end
+
+function menu:update(dt)
+	p1:menuUpdate(dt)
+	p2:menuUpdate(dt)
+	menuObjSpawner:update(dt)
 end
 
 function menu:draw()
-    love.graphics.print(message, love.window.getWidth()/2 - font:getWidth(message)/2, love.window.getHeight()/2 - font:getHeight(message)/2)
+	love.graphics.print(message, love.window.getWidth()/2 - font:getWidth(message)/2, love.window.getHeight()/2 - font:getHeight(message)/2)
+	p1:draw()
+	p2:draw()
+	menuObjSpawner:draw(dt)
 end
 
--- function menu:keyreleased(key, code)
---     if key == 'enter' or key == 'return' then
---         Gamestate.switch(game)
---     end
--- end
+function menu:leave()
+	-- world:destroy()
+	p1 = nil
+	p2 = nil
+end
+
+function menu:keyreleased(key, code)
+    if key == 'enter' or key == 'return' then
+        Gamestate.switch(game)
+    end
+end
 
 function menu:joystickreleased(key, code)
 	if code == 9 then
-        Gamestate.switch(game)
+		Gamestate.switch(game)
 	end
 end
 
 function game:enter()
 	--particle generators
-	local particleSprite = love.graphics.newImage('img/particle.png')
-	partExplosion = love.graphics.newParticleSystem(particleSprite, 300)
-	partExplosion:setAreaSpread('normal', 4, 4)
-	partExplosion:setParticleLifetime(0, 1)
-	partExplosion:setDirection(-math.pi / 2)
-	partExplosion:setSpread(math.pi / 2)
-	partExplosion:setSpeed(100, 500)
-	partExplosion:setColors(255, 255, 255, 255, 255, 255, 0, 255, 255, 30, 0, 255, 255, 0, 0, 128)
-	partExplosion:setSizes(2, 0)
-	partExplosion:setLinearAcceleration(0, 500, 0, 1000)
+	particleSprite = love.graphics.newImage('img/particle.png')
 
-	partSmoke = love.graphics.newParticleSystem(particleSprite, 300)
-	partSmoke:setAreaSpread('normal', 4, 4)
-	partSmoke:setParticleLifetime(0, 0.5)
-	partSmoke:setSpread(math.pi * 2)
-	partSmoke:setSpeed(0, 200)
-	partSmoke:setColors(220, 220, 220, 255, 120, 120, 120, 255)
-	partSmoke:setSizes(3, 0)
-
-	particleSprite = love.graphics.newImage('img/sparkle.png')
-	partSparkle = love.graphics.newParticleSystem(particleSprite, 300)
-	partSparkle:setAreaSpread('normal', 4, 4)
-	partSparkle:setParticleLifetime(0, 0.5)
-	partSparkle:setDirection(-math.pi / 2)
-	partSparkle:setSpread(math.pi * 2)
-	partSparkle:setSpeed(0, 400)
-	partSparkle:setSizes(3, 1)
+	genPartExplosion()
+	genPartSparkle()
 
 	--camera
 	camShake = 0
 	cam = Camera(love.window.getWidth()/2, love.window.getHeight()/2)
 
 	love.physics.setMeter(64)
-	world = love.physics.newWorld(0, 0, true)
-    world:setCallbacks(beginContact, endContact, preSolve, postSolve)
+	-- world = love.physics.newWorld(0, 0, true)
+	-- 		world:setCallbacks(beginContact, endContact, preSolve, postSolve)
 
 	p1 = Player(1)
 	p2 = Player(2)
@@ -194,6 +196,39 @@ function love.keypressed(key)
 	if key == 'escape' then
     	love.event.push('quit')
     end
+end
+
+function genPartExplosion()
+	partExplosion = love.graphics.newParticleSystem(particleSprite, 300)
+	partExplosion:setAreaSpread('normal', 4, 4)
+	partExplosion:setParticleLifetime(0, 1)
+	partExplosion:setDirection(-math.pi / 2)
+	partExplosion:setSpread(math.pi / 2)
+	partExplosion:setSpeed(100, 500)
+	partExplosion:setColors(255, 255, 255, 255, 255, 255, 0, 255, 255, 30, 0, 255, 255, 0, 0, 128)
+	partExplosion:setSizes(2, 0)
+	partExplosion:setLinearAcceleration(0, 500, 0, 1000)
+end
+
+function genPartSmoke()
+	partSmoke = love.graphics.newParticleSystem(particleSprite, 300)
+	partSmoke:setAreaSpread('normal', 4, 4)
+	partSmoke:setParticleLifetime(0, 0.5)
+	partSmoke:setSpread(math.pi * 2)
+	partSmoke:setSpeed(0, 200)
+	partSmoke:setColors(220, 220, 220, 255, 120, 120, 120, 255)
+	partSmoke:setSizes(3, 0)
+end
+
+function genPartSparkle()
+	particleSprite = love.graphics.newImage('img/sparkle.png')
+	partSparkle = love.graphics.newParticleSystem(particleSprite, 300)
+	partSparkle:setAreaSpread('normal', 4, 4)
+	partSparkle:setParticleLifetime(0, 0.5)
+	partSparkle:setDirection(-math.pi / 2)
+	partSparkle:setSpread(math.pi * 2)
+	partSparkle:setSpeed(0, 400)
+	partSparkle:setSizes(3, 1)
 end
 
 function beginContact(a, b, coll)

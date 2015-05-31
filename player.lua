@@ -19,7 +19,8 @@ Player = Class {
 	init = function(self, playerNum)
 		self.type = OBJ_TYPE.PLAYER
 		self.id = playerNum
-		self.pos = Vector(playerNum*475, 420)
+		self.pos = Vector((playerNum * 2 - 1) * CONSTANTS.SCREEN_WIDTH / 4,
+			CONSTANTS.SCREEN_HEIGHT / 2)
 		self.oldPos = self.pos
 		self.vel = Vector(0, 0)
 		self.direction = 1
@@ -157,6 +158,10 @@ function Player:update(dt)
 
 end
 
+function Player:menuUpdate(dt)
+	self.anim:update(dt)
+end
+
 function Player:draw()
 	local sWidth, sHeight = CONSTANTS.SCREEN_WIDTH, CONSTANTS.SCREEN_HEIGHT
 
@@ -205,8 +210,16 @@ function Player:dropMine()
 	for key, mine in pairs(self.mines) do mine:setId(key) end
 end
 
+function Player:getPos()
+	return self.pos
+end
+
 function Player:getMines()
 	return self.mines
+end
+
+function Player:getCoins()
+	return self.coins
 end
 
 function Player:collectCoin()
@@ -217,10 +230,6 @@ end
 
 function Player:setEnemy(enemy)
 	self.enemy = enemy
-end
-
-function Player:getCoins()
-	return self.coins
 end
 
 function Player:stun()
