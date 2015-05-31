@@ -35,9 +35,6 @@ function menu:enter()
 			menuCoins[id][i] = spriteData
 		end
 	end
-
-	particleSprite = love.graphics.newImage('img/particle.png')
-	genPartSmoke()
 end
 
 function menu:update(dt)
@@ -119,11 +116,7 @@ function game:enter()
 	KAMON = love.graphics.newImage('img/kamon.png')
 	UI_MARGIN = 40
 
-	--particle generators
-	particleSprite = love.graphics.newImage('img/particle.png')
-
-	genPartExplosion()
-	genPartSparkle()
+	genPart()
 
 	--camera
 	camShake = 0
@@ -146,6 +139,7 @@ function game:update(dt)
 	partExplosion:update(dt)
 	partSmoke:update(dt)
 	partSparkle:update(dt)
+	partWasabi:update(dt)
 	p1:update(dt)
 	p2:update(dt)
 	objSpawner:update(dt)
@@ -168,6 +162,7 @@ function game:draw()
 	love.graphics.setColor(220, 60, 30)
 	love.graphics.draw(KAMON, CONSTANTS.SCREEN_WIDTH/2, CONSTANTS.SCREEN_HEIGHT/2, 0, 3, 2, 77, 77)
 	love.graphics.setColor(255, 255, 255)
+	love.graphics.draw(partWasabi)
 	p1:draw()
 	p2:draw()
 	objSpawner:draw()
@@ -303,9 +298,10 @@ function love.keypressed(key)
     end
 end
 
-function genPartExplosion()
+function genPart()
+	local particleSprite = love.graphics.newImage('img/particle.png')
 	partExplosion = love.graphics.newParticleSystem(particleSprite, 300)
-	partExplosion:setAreaSpread('normal', 4, 4)
+	partExplosion:setAreaSpread('normal', 4, 0)
 	partExplosion:setParticleLifetime(0, 1)
 	partExplosion:setDirection(-math.pi / 2)
 	partExplosion:setSpread(math.pi / 2)
@@ -313,9 +309,7 @@ function genPartExplosion()
 	partExplosion:setColors(255, 255, 255, 255, 255, 255, 0, 255, 255, 30, 0, 255, 255, 0, 0, 128)
 	partExplosion:setSizes(2, 0)
 	partExplosion:setLinearAcceleration(0, 500, 0, 1000)
-end
 
-function genPartSmoke()
 	partSmoke = love.graphics.newParticleSystem(particleSprite, 300)
 	partSmoke:setAreaSpread('normal', 4, 4)
 	partSmoke:setParticleLifetime(0, 0.5)
@@ -323,9 +317,16 @@ function genPartSmoke()
 	partSmoke:setSpeed(0, 200)
 	partSmoke:setColors(220, 220, 220, 255, 120, 120, 120, 255)
 	partSmoke:setSizes(3, 0)
-end
 
-function genPartSparkle()
+	partWasabi = love.graphics.newParticleSystem(particleSprite, 300)
+	partWasabi:setAreaSpread('normal', 16, 16)
+	partWasabi:setParticleLifetime(0, 0.5)
+	partWasabi:setDirection(-math.pi/2)
+	partWasabi:setSpread(math.pi/4)
+	partWasabi:setSpeed(0, 200)
+	partWasabi:setColors(160, 240, 80, 255, 40, 160, 30, 255, 30, 100, 40, 0)
+	partWasabi:setSizes(2, 0)
+
 	particleSprite = love.graphics.newImage('img/sparkle.png')
 	partSparkle = love.graphics.newParticleSystem(particleSprite, 300)
 	partSparkle:setAreaSpread('normal', 4, 4)
@@ -354,7 +355,7 @@ function beginContact(a, b, coll)
 
 	if player and mine then
 		if player.id ~= mine.player.id then mine:explode(false) end
-	elseif player and coin then
+	elseif player and coin and not player:isSpiced() then
 		if player:collectCoin(coin) >= CONSTANTS.MAX_COINS then
 			Gamestate.switch(over, player.id, game)
 		end

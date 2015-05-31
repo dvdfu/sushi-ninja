@@ -12,7 +12,7 @@ Player = Class {
 	SHADOW_SPR = love.graphics.newImage('img/shadow.png'),
 	BLUR_SPR = love.graphics.newImage('img/blur2.png'),
 	STAR_SPR = love.graphics.newImage('img/star.png'),
-	BLUR_TIMEOUT = 1 / 20,
+	BLUR_TIMEOUT = 1 / 15,
  	ROTATION_FACTOR = 0.15,
  	MAX_MINES = 3,
 	DASH_SFX = love.audio.newSource("sfx/swoosh.mp3"),
@@ -55,6 +55,7 @@ Player = Class {
 		self.preT = 0
 		self.hurtTimer = 0
 		self.stunTimer = 0
+		self.wasabiTimer = 0
 
 		self.enemy = nil
 
@@ -77,8 +78,25 @@ function Player:update(dt)
 		self.stunTimer = 0
 	end
 
+	--wasabi
+	if self.wasabiTimer > 0 then
+		partWasabi:setPosition(self.pos:unpack())
+		partWasabi:emit(3)
+		self.wasabiTimer = self.wasabiTimer - dt
+		self.anim:setSpeed(5)
+	else
+		self.wasabiTimer = 0
+		self.anim:setSpeed(1)
+	end
+
 	self.vel = Vector(0, 0)
-	if self.cursorTimer == 0 and self.stunTimer == 0 then self.vel = self.vel + Vector(lsx, lsy) * Player.SPEED end
+	if self.cursorTimer == 0 and self.stunTimer == 0 then
+		if self:isSpiced() then
+			self.vel = self.vel + Vector(lsx, lsy) * Player.SPEED * 1.5
+		else
+			self.vel = self.vel + Vector(lsx, lsy) * Player.SPEED
+		end
+	end
 
 	if self.vel:len() > 0 then self.anim = self.runAnim
 	else self.anim = self.idleAnim end
@@ -108,7 +126,7 @@ function Player:update(dt)
  	    self.cursorLastAngle = angle
      	self.cursorAngle = (angle*Player.ROTATION_FACTOR) + (self.cursorAngle*(1.0 - Player.ROTATION_FACTOR))
 
-		if (rsx == 0 and rsy == 0) or self.stunTimer > 0  then
+		if (rsx == 0 and rsy == 0) or self.stunTimer > 0 or self:isSpiced() then
 			self.cursor = false
 			self.cursorRadius = 0
 		elseif self.controller:RB() or self.controller:LB() then --on dash
@@ -120,7 +138,7 @@ function Player:update(dt)
 			self.body:setPosition((self.pos + self.cursorRadius * Vector(math.cos(self.cursorAngle), math.sin(self.cursorAngle))):unpack())
 		end
 	else
-		if self.cursorTimer == 0 and not (self.controller:RB() or self.controller:LB()) and (rsx ~= 0 or rsy ~= 0) and self.stunTimer == 0  then
+		if self.cursorTimer == 0 and not (self.controller:RB() or self.controller:LB()) and (rsx ~= 0 or rsy ~= 0) and self.stunTimer == 0 and not self:isSpiced() then
 			self.cursor = true
 			self.cursorRadius = 0
 			self.cursorVelocity = 10
@@ -221,6 +239,7 @@ function Player:getCoins()
 end
 
 function Player:collectCoin()
+	if self:isSpiced() then return end
 	self.coins = self.coins + 1
 	-- print('Player ', self.id, ': ', self.coins, ' coins')
 	return self.coins
@@ -228,6 +247,10 @@ end
 
 function Player:setEnemy(enemy)
 	self.enemy = enemy
+end
+
+function Player:isSpiced()
+	return self.wasabiTimer > 0
 end
 
 function Player:stun()
