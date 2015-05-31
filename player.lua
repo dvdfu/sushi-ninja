@@ -7,6 +7,7 @@ Mine = require 'mine'
 Player = Class {
 	SPEED = 300,
 	IDLE_SPR = love.graphics.newImage('img/player_idle.png'),
+	RUN_SPR = love.graphics.newImage('img/player_run.png'),
 	BLUR_SPR = love.graphics.newImage('img/blur.png'),
 	BLUR_TIMEOUT = 1 / 20,
  	ROTATION_FACTOR = 0.15,
@@ -16,6 +17,7 @@ Player = Class {
 		self.pos = Vector(playerNum*475, 420)
 		self.oldPos = self.pos
 		self.vel = Vector(0, 0)
+		self.direction = 1
 
 		self.cursorAngle = 0
 		self.cursorRadius = 0
@@ -28,15 +30,19 @@ Player = Class {
 		self.controller = Controller(playerNum)
 
 		self.body = love.physics.newBody(world, self.pos.x, self.pos.y, 'dynamic')
-		self.shape = love.physics.newCircleShape(16)
+		self.shape = love.physics.newCircleShape(32)
 		self.fixture = love.physics.newFixture(self.body, self.shape)
 		self.fixture:setUserData(self)
 		self.fixture:setCategory(self.id)
 		self.fixture:setMask(self.id)
 
- 		self.idleAnim = newAnimation(Player.IDLE_SPR, 32, 32, 0.4, 0)
-
 		Player.BLUR_SPR:setFilter('nearest', 'nearest')
+		Player.IDLE_SPR:setFilter('nearest', 'nearest')
+		Player.RUN_SPR:setFilter('nearest', 'nearest')
+
+ 		self.idleAnim = newAnimation(Player.IDLE_SPR, 32, 32, 0.4, 0)
+ 		self.runAnim = newAnimation(Player.RUN_SPR, 32, 32, 0.1, 0)
+ 		self.anim = self.idleAnim
 
 		self.mines = {}
 		self.minesCount = 0
@@ -47,7 +53,7 @@ Player = Class {
 }
 
 function Player:update(dt)
-	self.idleAnim:update(dt)
+	self.anim:update(dt)
 	local lsx, lsy = self.controller:LSX(), self.controller:LSY()
 	local rsx, rsy = self.controller:RSX(), self.controller:RSY()
 
@@ -55,6 +61,17 @@ function Player:update(dt)
 	if self.cursorTimer == 0 then
 		self.vel = self.vel + Vector(self.controller:LSX(), self.controller:LSY()) * Player.SPEED
 	end
+	if self.vel:len() > 0 then
+		self.anim = self.runAnim
+	else
+		self.anim = self.idleAnim
+	end
+	if self.vel.x > 0 then
+		self.direction = 1
+	elseif self.vel.x < 0 then
+		self.direction = -1
+	end
+
 	self.body:setLinearVelocity(self.vel:unpack())
 	self.pos = Vector(self.body:getX(), self.body:getY())
 
@@ -98,8 +115,6 @@ function Player:update(dt)
 		self:dropMine()
 		self.preT = love.timer.getTime()
 	end
-
-	-- self.body:setPosition(self.pos.x, self.pos.y)
 end
 
 function Player:draw()
@@ -109,11 +124,18 @@ function Player:draw()
 		love.graphics.circle('line', self.pos.x + cursorPos.x, self.pos.y + cursorPos.y, 16)
 	end
 
-	if self.cursorTimer > 0 then
-		love.graphics.draw(Player.BLUR_SPR, self.oldPos.x, self.oldPos.y, self.cursorAngle, (self.cursorRadius + 16) / 128, 1, 0, 16)
+	if self.id == 1 then
+		love.graphics.setColor(255, 255, 0)
+	else
+		love.graphics.setColor(0, 255, 255)
 	end
 
-	self.idleAnim:draw(self.body:getX(), self.body:getY(), 0, 1, 1, 16, 16)
+	if self.cursorTimer > 0 then
+		love.graphics.draw(Player.BLUR_SPR, self.oldPos.x, self.oldPos.y, self.cursorAngle, (self.cursorRadius + 16) / 128, 2, 0, 16)
+	end
+
+	self.anim:draw(self.body:getX(), self.body:getY(), 0, 2 * self.direction, 2, 16, 16)
+	love.graphics.setColor(255, 255, 255)
 end
 
 function Player:dropMine()
