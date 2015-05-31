@@ -16,7 +16,8 @@ function love.load()
 
 	p1 = Player(1)
 	p2 = Player(2)
-	c = Controller(1)
+	p1:setEnemy(p2)
+	p2:setEnemy(p1)
 	objSpawner = ObjSpawner()
 	objSpawner:addSpawn(OBJ_TYPE.COIN, 0.05)
 end

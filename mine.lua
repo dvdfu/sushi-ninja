@@ -2,6 +2,8 @@ Class = require 'lib.class'
 Vector = require 'lib.vector'
 
 Mine = Class{
+	KNOCK_BACK = 5,
+	DANGER_PROXIMITY = 100,
 	init = function(self, id, x, y, player)
 		self.type = OBJ_TYPE.MINE
 		self.id = id
@@ -9,7 +11,7 @@ Mine = Class{
 		self.player = player
 
 		self.body = love.physics.newBody(world, self.pos.x, self.pos.y, 'kinematic')
-		self.shape = love.physics.newCircleShape(5)
+		self.shape = love.physics.newCircleShape(36)
 		self.fixture = love.physics.newFixture(self.body, self.shape, 0)
 		self.fixture:setUserData(self)
 		self.fixture:setCategory(self.player.id)
@@ -29,7 +31,13 @@ end
 function Mine:explode()
 	for key, mine in pairs(self.player.mines) do
 		if key == self.id then
-			table.remove(self.player.mines, key).body:destroy()
+			local mine = table.remove(self.player.mines, key)
+			local diff = mine.pos - self.player.enemy.pos
+			if diff:len() < Mine.DANGER_PROXIMITY then
+				self.player.enemy.body:applyLinearImpulse(-diff.x*Mine.KNOCK_BACK,-diff.y*Mine.KNOCK_BACK)
+				self.player.enemy.hurtTimer = 0.1
+			end
+			mine.body:destroy()
 			self.player.minesCount = self.player.minesCount - 1
 			for key, mine in pairs(self.player.mines) do mine:setId(key) end
 			return

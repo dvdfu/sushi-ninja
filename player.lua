@@ -47,8 +47,11 @@ Player = Class {
 		self.mines = {}
 		self.minesCount = 0
 		self.preT = 0
+		self.hurtTimer = 0
 
 		self.coinCount = 0
+
+		self.enemy = nil
 	end
 }
 
@@ -61,6 +64,7 @@ function Player:update(dt)
 	if self.cursorTimer == 0 then
 		self.vel = self.vel + Vector(self.controller:LSX(), self.controller:LSY()) * Player.SPEED
 	end
+
 	if self.vel:len() > 0 then
 		self.anim = self.runAnim
 	else
@@ -72,8 +76,13 @@ function Player:update(dt)
 		self.direction = -1
 	end
 
-	self.body:setLinearVelocity(self.vel:unpack())
-	self.pos = Vector(self.body:getX(), self.body:getY())
+	if self.hurtTimer > 0 then
+		self.hurtTimer = self.hurtTimer - dt
+	else
+		self.body:setLinearVelocity(self.vel:unpack())
+		self.pos = Vector(self.body:getX(), self.body:getY())
+		self.hurtTimer = 0
+	end
 
 	--cursor logic
 	if self.cursorTimer > 0 then
@@ -156,5 +165,10 @@ function Player:collectCoin()
 	print('Player ', self.id, ': ', self.coinCount, ' coins')
 	return self.coinCount
 end
+
+function Player:setEnemy(enemy)
+	self.enemy = enemy
+end
+
 
 return Player
