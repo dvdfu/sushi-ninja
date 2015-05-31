@@ -12,13 +12,9 @@ local game = {}
 local pause = {}
 local over = {}
 
-function menu:enter()
-    font = love.graphics.getFont()
-    message = "Press START to play!"
-end
-
 function menu:draw()
-    love.graphics.print(message, love.window.getWidth()/2 - font:getWidth(message)/2, love.window.getHeight()/2 - font:getHeight(message)/2)
+    love.graphics.setColor(255,255,255)
+    love.graphics.printf("Press START to play!", 0, CONSTANTS.SCREEN_HEIGHT/2, CONSTANTS.SCREEN_WIDTH, 'center')
 end
 
 -- function menu:keyreleased(key, code)
@@ -140,14 +136,11 @@ function pause:enter(from)
 end
 
 function pause:draw()
-    local W, H = love.graphics.getWidth(), love.graphics.getHeight()
-    -- draw previous screen
     self.from:draw()
-    -- overlay with pause message
     love.graphics.setColor(0,0,0, 100)
-    love.graphics.rectangle('fill', 0,0, W,H)
+    love.graphics.rectangle('fill', 0,0, CONSTANTS.SCREEN_WIDTH,CONSTANTS.SCREEN_HEIGHT)
     love.graphics.setColor(255,255,255)
-    love.graphics.printf('PAUSE', 0, H/2, W, 'center')
+    love.graphics.printf('PAUSE', 0, CONSTANTS.SCREEN_HEIGHT/2, CONSTANTS.SCREEN_WIDTH, 'center')
 end
 
 -- function pause:keypressed(key)
@@ -162,13 +155,18 @@ function pause:joystickpressed(key, code)
 	end
 end
 
-function over:enter(to, winner)
+function over:enter(to, winner, from)
+	self.from = from
     font = love.graphics.getFont()
     message = "Player " .. winner .. " is the ultimate sushi warrior!\nPress start to duel again."
 end
 
 function over:draw()
-    love.graphics.print(message, love.window.getWidth()/2 - font:getWidth(message)/2, love.window.getHeight()/2 - font:getHeight(message)/2)
+    self.from:draw()
+    love.graphics.setColor(0,0,0, 100)
+    love.graphics.rectangle('fill', 0,0, CONSTANTS.SCREEN_WIDTH,CONSTANTS.SCREEN_HEIGHT)
+    love.graphics.setColor(255,255,255)
+    love.graphics.printf(message, 0, CONSTANTS.SCREEN_HEIGHT/2, CONSTANTS.SCREEN_WIDTH, 'center')
 end
 
 -- function over:keyreleased(key, code)
@@ -216,7 +214,7 @@ function beginContact(a, b, coll)
 		if player.id ~= mine.player.id then mine:explode(false) end
 	elseif player and coin then
 		if player:collectCoin(coin) >= CONSTANTS.MAX_COINS then
-			Gamestate.switch(over, player.id)
+			Gamestate.switch(over, player.id, game)
 		end
 		objSpawner:deleteItem(coin)
 	end

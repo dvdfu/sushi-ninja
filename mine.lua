@@ -60,6 +60,7 @@ function Mine:explode(silent)
 					self.player.enemy.body:applyLinearImpulse(-diff.x*Mine.KNOCK_BACK,-diff.y*Mine.KNOCK_BACK)
 					self.player.enemy.hurtTimer = 0.1
 					self.player.enemy:stun()
+					self.player.enemy.controller:setVibrate(1, 1, 0.25)
 				end
 			end
 
