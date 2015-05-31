@@ -1,5 +1,6 @@
 Player = require 'player'
 ObjSpawner = require 'obj_spawner'
+CONSTANTS = require 'constants'
 
 function love.load()
 	math.randomseed(os.time())
@@ -9,17 +10,12 @@ function love.load()
 	world = love.physics.newWorld(0, 0, true)
     world:setCallbacks(beginContact, endContact, preSolve, postSolve)
 
-	OBJ_TYPE = {}
-	OBJ_TYPE.PLAYER = 'PLAYER'
-	OBJ_TYPE.MINE = 'MINE'
-	OBJ_TYPE.COIN = 'COIN'
-
 	p1 = Player(1)
 	p2 = Player(2)
 	p1:setEnemy(p2)
 	p2:setEnemy(p1)
 	objSpawner = ObjSpawner()
-	objSpawner:addSpawn(OBJ_TYPE.COIN, 0.05)
+	objSpawner:addSpawn(OBJ_TYPE.COIN, CONSTANTS.COIN_SPAWN_FREQUENCY)
 end
 
 function love.update(dt)
