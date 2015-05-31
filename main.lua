@@ -33,6 +33,7 @@ function game:enter()
 	SUSHI_PLATE = love.graphics.newImage('img/sushi_plate.png')
 	SUSHI_COUNTER = love.graphics.newImage('img/sushi_counter.png')
 	TATAMI = love.graphics.newImage('img/tatami.png')
+	KAMON = love.graphics.newImage('img/kamon.png')
 	UI_MARGIN = 40
 
 	--particle generators
@@ -98,14 +99,15 @@ function game:update(dt)
 end
 
 function game:draw()
-	--background
-	for i = 0, 1 do
-		for j = 0, 1 do
-			love.graphics.draw(TATAMI, CONSTANTS.SCREEN_WIDTH/2-320+i*320, CONSTANTS.SCREEN_HEIGHT/2-240+j*240, 0, 2, 2)
-		end
-	end
-
 	cam:attach()
+	-- for i = 0, 1 do
+	-- 	for j = 0, 1 do
+	-- 		love.graphics.draw(TATAMI, CONSTANTS.SCREEN_WIDTH/2-320+i*320, CONSTANTS.SCREEN_HEIGHT/2-240+j*240, 0, 2, 2)
+	-- 	end
+	-- end
+	love.graphics.setColor(220, 60, 30)
+	love.graphics.draw(KAMON, CONSTANTS.SCREEN_WIDTH/2, CONSTANTS.SCREEN_HEIGHT/2, 0, 3, 2, 77, 77)
+	love.graphics.setColor(255, 255, 255)
 	p1:draw()
 	p2:draw()
 	objSpawner:draw()
@@ -210,7 +212,7 @@ end
 function love.load()
 	math.randomseed(os.time())
 	love.graphics.setNewFont('assets/babyblue.ttf', 64)
-	love.graphics.setBackgroundColor(240, 100, 60)
+	love.graphics.setBackgroundColor(60, 40, 30)
     Gamestate.registerEvents()
     Gamestate.switch(menu)
 end

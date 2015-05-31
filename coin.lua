@@ -6,7 +6,8 @@ Coin = Class {
 	SUSHI_SPR = {
 		love.graphics.newImage('img/sushi1.png'),
 		love.graphics.newImage('img/sushi2.png'),
-		love.graphics.newImage('img/sushi3.png')
+		love.graphics.newImage('img/sushi3.png'),
+		love.graphics.newImage('img/sushi4.png')
 	},
 	SHADOW_SPR = love.graphics.newImage('img/shadow.png'),
 	PICKUP_SFX = love.audio.newSource("sfx/sushi.wav"),
