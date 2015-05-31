@@ -30,6 +30,10 @@ function menu:joystickreleased(key, code)
 end
 
 function game:enter()
+	SUSHI_PLATE = love.graphics.newImage('img/sushi_plate.png')
+	SUSHI_COUNTER = love.graphics.newImage('img/sushi_counter.png')
+	UI_MARGIN = 40
+
 	--particle generators
 	local particleSprite = love.graphics.newImage('img/particle.png')
 	partExplosion = love.graphics.newParticleSystem(particleSprite, 300)
@@ -98,20 +102,39 @@ function game:draw()
 	p2:draw()
 	objSpawner:draw()
 
-	-- Draw labels
-	local playerCoins = {}
-	playerCoins[1] = string.format(CONSTANTS.SCORE_LABEL, 1, p1:getCoins())
-	playerCoins[2] = string.format(CONSTANTS.SCORE_LABEL, 2, p2:getCoins())
-	for p_id, text in pairs(playerCoins) do
-		love.graphics.print(text,
-			CONSTANTS.X_MARGIN + ((p_id - 1) * CONSTANTS.SCREEN_WIDTH / 2),
-			CONSTANTS.SCREEN_HEIGHT - CONSTANTS.Y_MARGIN)
-	end
 	love.graphics.draw(partSmoke)
 	love.graphics.draw(partSparkle)
 	love.graphics.setBlendMode('additive')
 	love.graphics.draw(partExplosion)
 	love.graphics.setBlendMode('alpha')
+
+	-- Draw labels
+	local playerCoins = {}
+	playerCoins[1] = string.format(CONSTANTS.SCORE_LABEL, 1, p1:getCoins())
+	playerCoins[2] = string.format(CONSTANTS.SCORE_LABEL, 2, p2:getCoins())
+
+	love.graphics.setColor(255, 255, 30)
+	love.graphics.draw(SUSHI_PLATE, UI_MARGIN, CONSTANTS.SCREEN_HEIGHT -UI_MARGIN, 0, 2, 2, 0, 16)
+	love.graphics.setColor(30, 255, 255)
+	love.graphics.draw(SUSHI_PLATE, CONSTANTS.SCREEN_WIDTH-UI_MARGIN, CONSTANTS.SCREEN_HEIGHT - UI_MARGIN, 0, 2, 2, 190, 16)
+	love.graphics.setColor(255, 255, 255)
+
+	for i = 0, p1:getCoins()-1 do
+		local sushiX = UI_MARGIN+28+(i%10)*36
+		local sushiY = CONSTANTS.SCREEN_HEIGHT-UI_MARGIN-12-math.floor(i/10)*22
+		love.graphics.draw(SUSHI_COUNTER, sushiX, sushiY, 0, 2, 2, 8, 24)
+	end
+	for i = 0, p2:getCoins()-1 do
+		local sushiX = CONSTANTS.SCREEN_WIDTH-UI_MARGIN-28-(i%10)*36
+		local sushiY = CONSTANTS.SCREEN_HEIGHT-UI_MARGIN-12-math.floor(i/10)*22
+		love.graphics.draw(SUSHI_COUNTER, sushiX, sushiY, 0, 2, 2, 8, 24)
+	end
+
+	for p_id, text in pairs(playerCoins) do
+		love.graphics.print(text,
+			CONSTANTS.X_MARGIN + ((p_id - 1) * CONSTANTS.SCREEN_WIDTH / 2),
+			CONSTANTS.SCREEN_HEIGHT - CONSTANTS.Y_MARGIN)
+	end
 	cam:detach()
 end
 
