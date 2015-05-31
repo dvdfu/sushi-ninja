@@ -23,7 +23,7 @@ Coin = Class {
 		Coin.iniId = Coin.iniId + 1
 
 		-- Coin Physics
-		self.body = love.physics.newBody(world, self.pos.x, self.pos.y, 'static')
+		self.body = love.physics.newBody(world, self.pos.x, self.pos.y, 'kinematic')
 		self.shape = love.physics.newCircleShape(Coin.RADIUS)
 		self.fixture = love.physics.newFixture(self.body, self.shape)
 		self.fixture:setUserData(self)
