@@ -2,6 +2,7 @@ require 'lib.anim'
 Class = require 'lib.class'
 Vector = require 'lib.vector'
 Controller = require 'controller'
+Mine = require 'mine'
 
 Player = Class {
 	SPEED = 300,
@@ -10,6 +11,7 @@ Player = Class {
 	BLUR_TIMEOUT = 1 / 20,
  	ROTATION_FACTOR = 0.15,
 	init = function(self, playerNum)
+		self.type = 'PLAYER'
 		self.id = playerNum
 		self.pos = Vector(playerNum*475, 420)
 		self.oldPos = self.pos
@@ -28,11 +30,19 @@ Player = Class {
 		self.body = love.physics.newBody(world, self.pos.x, self.pos.y, 'dynamic')
 		self.shape = love.physics.newCircleShape(16)
 		self.fixture = love.physics.newFixture(self.body, self.shape)
+		self.fixture:setUserData(self)
+		self.fixture:setCategory(self.id)
+		self.fixture:setMask(self.id)
 
  		self.idleAnim = newAnimation(Player.IDLE_SPR, 32, 32, 0.4, 0)
 
 		Player.BLUR_SPR:setFilter('nearest', 'nearest')
-		Player.IDLE_SPR:setFilter('nearest', 'nearest')
+
+		self.mines = {}
+		self.minesCount = 0
+		self.preT = 0
+
+		self.coinCount = 0
 	end
 }
 
@@ -83,9 +93,17 @@ function Player:update(dt)
 			self.cursorVelocity = 10
 		end
 	end
+
+	if love.timer.getTime() - self.preT > 0.5 and self.controller:RT() == 1 then
+		self:dropMine()
+		self.preT = love.timer.getTime()
+	end
+
+	-- self.body:setPosition(self.pos.x, self.pos.y)
 end
 
 function Player:draw()
+	for key, mine in pairs(self.mines) do mine:draw() end
 	if self.cursor then
 		local cursorPos = self.cursorRadius * Vector(math.cos(self.cursorAngle), math.sin(self.cursorAngle))
 		love.graphics.circle('line', self.pos.x + cursorPos.x, self.pos.y + cursorPos.y, 16)
@@ -96,6 +114,24 @@ function Player:draw()
 	end
 
 	self.idleAnim:draw(self.body:getX(), self.body:getY(), 0, 1, 1, 16, 16)
+end
+
+function Player:dropMine()
+	self.minesCount = self.minesCount + 1
+	if self.minesCount > 5 then
+		self.mines[5]:explode()
+	end
+	table.insert(self.mines, 1, Mine(1, self.pos.x, self.pos.y, self))
+	for key, mine in pairs(self.mines) do mine:setId(key) end
+end
+
+function Player:getMines()
+	return self.mines
+end
+
+function Player:collectCoin()
+	self.coinCount = self.coinCount + 1
+	return self.coinCount
 end
 
 return Player

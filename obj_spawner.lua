@@ -8,9 +8,6 @@ ObjSpawner = Class {
 		math.randomseed(os.time())
 		self.xBound, self.yBound = love.graphics.getDimensions()
 		self.objsToSpawn = {}
-		if self.objsToSpawn == nil then
-			print('THIS IS NIL')
-		end
 		self.spawner = {}
 		self.objSpawnerTimer = Timer.new()
 	end
@@ -52,8 +49,8 @@ end
 
 function ObjSpawner:draw()
 	-- Draw spawned objects
-	for k in pairs(self.objsToSpawn) do
-		for l in pairs(self.objsToSpawn[k]) do
+	for k, objs in pairs(self.objsToSpawn) do
+		for l, obj in pairs(objs) do
 			if obj ~= 0 then
 				self.objsToSpawn[k][l]:draw()
 			end
@@ -61,4 +58,10 @@ function ObjSpawner:draw()
 	end
 end
 
+-- Deletes a single item from a list of objects (e.g. coins)
+function ObjSpawner:deleteItem(obj)
+	objType = obj.TYPE
+	objId = obj.id
+	self.objsToSpawn[objType][objId] = 0
+end
 return ObjSpawner

@@ -3,12 +3,19 @@ Vector = require 'lib.vector'
 
 Coin = Class {
 	RADIUS = 5,
-	INI_ID = 0,
-	OBJ_TYPE = 'coin',
+	INI_ID = 1,
+	OBJ_TYPE = 'COIN',
 	init = function(self, pos)
+		self.TYPE = Coin.OBJ_TYPE
 		self.pos = pos
 		self.id = Coin.INI_ID
 		Coin.INI_ID = Coin.INI_ID + 1
+
+		-- Coin Physics
+		self.body = love.physics.newBody(world, self.pos.x, self.pos.y, 'static')
+		self.shape = love.physics.newCircleShape(Coin.RADIUS)
+		self.fixture = love.physics.newFixture(self.body, self.shape)
+		self.fixture:setUserData(self)
 	end
 }
 
