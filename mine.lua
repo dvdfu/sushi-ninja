@@ -32,11 +32,9 @@ function Mine:explode()
 	for key, mine in pairs(self.player.mines) do
 		if key == self.id then
 			local mine = table.remove(self.player.mines, key)
-			local diff = (mine.pos - self.player.enemy.pos)
-			print("EXPLOSION DIFF", diff.x, diff.y, diff:len())
+			local diff = mine.pos - self.player.enemy.pos
 			if diff:len() < Mine.DANGER_PROXIMITY then
 				self.player.enemy.body:applyLinearImpulse(-diff.x*Mine.KNOCK_BACK,-diff.y*Mine.KNOCK_BACK)
-				-- self.player.enemy.body:applyForce(-diff.x*Mine.KNOCK_BACK,-diff.y*Mine.KNOCK_BACK)
 				self.player.enemy.hurtTimer = 0.1
 			end
 			mine.body:destroy()

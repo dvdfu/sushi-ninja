@@ -1,6 +1,5 @@
 Player = require 'player'
 ObjSpawner = require 'obj_spawner'
-Vector = require 'lib.vector'
 
 function love.load()
 	math.randomseed(os.time())
