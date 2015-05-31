@@ -52,7 +52,7 @@ function game:enter()
 	p1:setEnemy(p2)
 	p2:setEnemy(p1)
 	objSpawner = ObjSpawner()
-	objSpawner:addSpawn(OBJ_TYPE.COIN, CONSTANTS.COIN_SPAWN_FREQUENCY)
+	objSpawner:addSpawn(OBJ_TYPE.COIN, CONSTANTS.COIN_SPAWN_FREQUENCY, CONSTANTS.MAX_COINS_ON_SCREEN, nil)
 end
 
 function game:update(dt)
@@ -95,7 +95,7 @@ function game:joystickpressed(key, code)
 end
 
 function game:remove()
-	objSpawner:clear()
+	objSpawner:clearAll()
 end
 
 function pause:enter(from)
