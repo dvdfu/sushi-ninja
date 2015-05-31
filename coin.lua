@@ -2,7 +2,7 @@ Class = require 'lib.class'
 Vector = require 'lib.vector'
 
 Coin = Class {
-	RADIUS = 5,
+	RADIUS = 32,
 	INI_ID = 1,
 	SUSHI_SPR = {
 		love.graphics.newImage('img/sushi1.png'),
@@ -31,10 +31,6 @@ function Coin:update(dt)
 end
 
 function Coin:draw()
-	-- Set draw to Yellow
-	-- love.graphics.setColor(255, 255, 0)
-	-- love.graphics.circle('line', self.pos.x, self.pos.y, Coin.RADIUS, 10)
-	-- love.graphics.setColor(255, 255, 255)
 	love.graphics.draw(self.sprite, self.pos.x, self.pos.y, 0, 2, 2, 16, 16)
 end
 

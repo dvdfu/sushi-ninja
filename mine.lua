@@ -2,7 +2,7 @@ Class = require 'lib.class'
 Vector = require 'lib.vector'
 
 Mine = Class{
-	KNOCK_BACK = 10,
+	KNOCK_BACK = 20,
 	DANGER_PROXIMITY = 100,
 	init = function(self, id, x, y, player)
 		self.type = OBJ_TYPE.MINE
