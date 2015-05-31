@@ -50,8 +50,6 @@ Player = Class {
 		self.preT = 0
 		self.hurtTimer = 0
 
-		self.coinCount = 0
-
 		self.enemy = nil
 	end
 }
@@ -140,14 +138,17 @@ function Player:getMines()
 end
 
 function Player:collectCoin()
-	self.coinCount = self.coinCount + 1
-	print('Player ', self.id, ': ', self.coinCount, ' coins')
-	return self.coinCount
+	self.coins = self.coins + 1
+	print('Player ', self.id, ': ', self.coins, ' coins')
+	return self.coins
 end
 
 function Player:setEnemy(enemy)
 	self.enemy = enemy
 end
 
+function Player:getCoins()
+	return self.coins
+end
 
 return Player
