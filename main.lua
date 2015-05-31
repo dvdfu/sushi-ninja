@@ -19,6 +19,7 @@ function menu:enter(to)
 	font = love.graphics.getFont()
 	self.message = "Press START to play!"
 	sushiTimer = 0
+	LOGO = love.graphics.newImage('img/logo.png')
 
 	idlePlayerAnim = newAnimation(Player.IDLE_SPR, 32, 32, 0.4, 0)
 	menuCoins = {{}, {}}
@@ -27,7 +28,7 @@ function menu:enter(to)
 		for id in pairs(menuCoins) do
 			local sprite = Coin.SUSHI_SPR[math.random(#Coin.SUSHI_SPR)]
 			local posX = i * sWidth / 20
-			local posY = (id * 3 - 2) * sHeight / 5
+			local posY = sHeight/2+((id-1) * 2 - 1) * sHeight *2/5
 			spriteData = {
 				spr = sprite,
 				pos = Vector(posX, posY)
@@ -61,10 +62,16 @@ function menu:update(dt)
 end
 
 function menu:draw()
-	love.graphics.printf(self.message, 0, CONSTANTS.SCREEN_HEIGHT/2, CONSTANTS.SCREEN_WIDTH, 'center')
+	love.graphics.setColor(0,0,0)
+	love.graphics.draw(LOGO, CONSTANTS.SCREEN_WIDTH/2, CONSTANTS.SCREEN_HEIGHT/2, 0, 2, 2, 180, 90)
+	love.graphics.setColor(255,40,0)
+	love.graphics.draw(LOGO, CONSTANTS.SCREEN_WIDTH/2 - 8, CONSTANTS.SCREEN_HEIGHT/2 - 8, 0, 2, 2, 180, 90)
+	love.graphics.setColor(255,255,255)
+	love.graphics.printf(self.message, 0, CONSTANTS.SCREEN_HEIGHT/2 + 180, CONSTANTS.SCREEN_WIDTH, 'center')
+
 	for i = 1, CONSTANTS.NUM_PLAYERS do
 		love.graphics.setColor(P_COLOUR[i].r, P_COLOUR[i].g, P_COLOUR[i].b)
-		idlePlayerAnim:draw((i * 2 - 1) * CONSTANTS.SCREEN_WIDTH / 4,
+		idlePlayerAnim:draw(CONSTANTS.SCREEN_WIDTH/2 + ((i-1) * 2 - 1) * CONSTANTS.SCREEN_WIDTH / 3,
 			CONSTANTS.SCREEN_HEIGHT / 2, 0, 2, 2, 16, 16)
 	end
 
@@ -277,7 +284,7 @@ end
 
 function love.load()
 	math.randomseed(os.time())
-	love.graphics.setNewFont('assets/babyblue.ttf', 64)
+	love.graphics.setNewFont('assets/babyblue.ttf', 32)
 	love.graphics.setBackgroundColor(60, 40, 30)
 	bgm = love.audio.newSource("sfx/tsugaru_shamisen.wav", "stream")
 	bgm:setLooping( true )
