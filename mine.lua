@@ -12,6 +12,8 @@ Mine = Class{
 		self.shape = love.physics.newCircleShape(5)
 		self.fixture = love.physics.newFixture(self.body, self.shape, 0)
 		self.fixture:setUserData(self)
+		self.fixture:setCategory(self.player.id)
+		self.fixture:setMask(self.player.id)
 	end
 }
 

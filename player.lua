@@ -29,6 +29,8 @@ Player = Class {
 		self.shape = love.physics.newCircleShape(16)
 		self.fixture = love.physics.newFixture(self.body, self.shape)
 		self.fixture:setUserData(self)
+		self.fixture:setCategory(self.id)
+		self.fixture:setMask(self.id)
 
 		Player.BLUR_SPR:setFilter('nearest', 'nearest')
 
