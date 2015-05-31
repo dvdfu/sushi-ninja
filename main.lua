@@ -1,3 +1,5 @@
+love.graphics.setDefaultFilter('nearest', 'nearest')
+
 Player = require 'player'
 ObjSpawner = require 'obj_spawner'
 Gamestate = require 'lib.gamestate'
@@ -25,9 +27,6 @@ function menu:keyreleased(key, code)
 end
 
 function game:enter()
-	math.randomseed(os.time())
-	love.graphics.setDefaultFilter('nearest', 'nearest')
-	love.graphics.setBackgroundColor(40, 60, 80)
 	love.physics.setMeter(64)
 	world = love.physics.newWorld(0, 0, true)
     world:setCallbacks(beginContact, endContact, preSolve, postSolve)
@@ -81,6 +80,8 @@ function pause:keypressed(key)
 end
 
 function love.load()
+	math.randomseed(os.time())
+	love.graphics.setBackgroundColor(40, 60, 80)
     Gamestate.registerEvents()
     Gamestate.switch(menu)
 end
