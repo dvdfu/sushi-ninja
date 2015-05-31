@@ -4,26 +4,33 @@ Player = require 'player'
 ObjSpawner = require 'obj_spawner'
 Gamestate = require 'lib.gamestate'
 CONSTANTS = require 'constants'
+Controller = require 'controller'
 
 
 local menu = {}
 local game = {}
 local pause = {}
+local over = {}
 
-
-function menu:init()
+function menu:enter()
     font = love.graphics.getFont()
-    message = "Press Enter to continue"
+    message = "Press START to play!"
 end
 
 function menu:draw()
     love.graphics.print(message, love.window.getWidth()/2 - font:getWidth(message)/2, love.window.getHeight()/2 - font:getHeight(message)/2)
 end
 
-function menu:keyreleased(key, code)
-    if key == 'enter' or key == 'return' then
+-- function menu:keyreleased(key, code)
+--     if key == 'enter' or key == 'return' then
+--         Gamestate.switch(game)
+--     end
+-- end
+
+function menu:joystickreleased(key, code)
+	if code == 9 then
         Gamestate.switch(game)
-    end
+	end
 end
 
 function game:enter()
@@ -44,6 +51,11 @@ function game:update(dt)
 	p1:update(dt)
 	p2:update(dt)
 	objSpawner:update(dt)
+	if p1.coinCount > 4 then
+		Gamestate.switch(over, p1.id)
+	elseif p2.coinCount > 4 then
+		Gamestate.switch(over, p2.id)
+	end
 end
 
 function game:draw()
@@ -52,10 +64,16 @@ function game:draw()
 	objSpawner:draw()
 end
 
-function game:keypressed(key, code)
-    if key == 'p' then
+-- function game:keypressed(key, code)
+--     if key == 'p' then
+--         return Gamestate.push(pause)
+--     end
+-- end
+
+function game:joystickpressed(key, code)
+	if code == 9 then
         return Gamestate.push(pause)
-    end
+	end
 end
 
 function pause:enter(from)
@@ -73,10 +91,37 @@ function pause:draw()
     love.graphics.printf('PAUSE', 0, H/2, W, 'center')
 end
 
-function pause:keypressed(key)
-    if key == 'p' then
+-- function pause:keypressed(key)
+--     if key == 'p' then
+--         return Gamestate.pop()
+--     end
+-- end
+
+function pause:joystickpressed(key, code)
+	if code == 9 then
         return Gamestate.pop()
-    end
+	end
+end
+
+function over:enter(to, winner)
+    font = love.graphics.getFont()
+    message = "Player " .. winner .. " is the ultimate sushi warrior!\nPress start to duel again."
+end
+
+function over:draw()
+    love.graphics.print(message, love.window.getWidth()/2 - font:getWidth(message)/2, love.window.getHeight()/2 - font:getHeight(message)/2)
+end
+
+-- function over:keyreleased(key, code)
+--     if key == 'enter' or key == 'return' then
+--         Gamestate.switch(game)
+--     end
+-- end
+
+function over:joystickreleased(key, code)
+	if code == 9 then
+        Gamestate.switch(game)
+	end
 end
 
 function love.load()
