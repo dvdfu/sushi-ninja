@@ -56,6 +56,9 @@ Player = Class {
 		self.stunTimer = 0
 
 		self.enemy = nil
+
+		partSmoke:setPosition(self.pos:unpack())
+		partSmoke:emit(40)
 	end
 }
 
