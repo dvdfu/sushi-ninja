@@ -3,7 +3,12 @@ Vector = require 'lib.vector'
 
 Mine = Class{
 	KNOCK_BACK = 20,
-	DANGER_PROXIMITY = 100,
+	DANGER_PROXIMITY = 160,
+	SUSHI_SPR = {
+		love.graphics.newImage('img/sushi1.png'),
+		love.graphics.newImage('img/sushi2.png'),
+		love.graphics.newImage('img/sushi3.png')
+	},
 	init = function(self, id, x, y, player)
 		self.type = OBJ_TYPE.MINE
 		self.id = id
@@ -16,6 +21,8 @@ Mine = Class{
 		self.fixture:setUserData(self)
 		self.fixture:setCategory(self.player.id)
 		self.fixture:setMask(self.player.id)
+
+		self.sprite = Coin.SUSHI_SPR[math.random(#Coin.SUSHI_SPR)]
 	end
 }
 
@@ -23,12 +30,15 @@ function Mine:update(dt)
 end
 
 function Mine:draw()
-  love.graphics.setColor(0, 0, 0, 255)
-  love.graphics.circle('line', self.body:getX(), self.body:getY(), self.shape:getRadius())
-  love.graphics.setColor(255, 255, 255, 255)
+	love.graphics.setColor(0, 0, 0, 128)
+	love.graphics.draw(Coin.SHADOW_SPR, self.pos.x, self.pos.y+8, 0, 2, 2, 16, 16)
+	love.graphics.setColor(255, 255, 255, 255)
+	love.graphics.draw(self.sprite, self.pos.x, self.pos.y, 0, 2, 2, 16, 16)
 end
 
 function Mine:explode()
+	particles:setPosition(self.pos:unpack())
+	particles:emit(40)
 	for key, mine in pairs(self.player.mines) do
 		if key == self.id then
 			local mine = table.remove(self.player.mines, key)
