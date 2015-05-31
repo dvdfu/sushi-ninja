@@ -170,8 +170,13 @@ end
 
 function over:enter(to, winner, from)
 	self.from = from
-    font = love.graphics.getFont()
-    message = "Player " .. winner .. " is the ultimate sushi warrior!\nPress start to duel again."
+	local color = ""
+    if winner == 1 then
+    	color = "Yellow"
+    else
+    	color = "Blue"
+    end
+    message = color .. " is the ultimate sushi ninja!\nPress start to duel again."
 end
 
 function over:draw()
@@ -196,6 +201,7 @@ end
 
 function love.load()
 	math.randomseed(os.time())
+	love.graphics.setNewFont('assets/babyblue.ttf', 64)
 	love.graphics.setBackgroundColor(90, 80, 70)
     Gamestate.registerEvents()
     Gamestate.switch(menu)
