@@ -9,6 +9,8 @@ Mine = Class{
 		love.graphics.newImage('img/sushi2.png'),
 		love.graphics.newImage('img/sushi3.png')
 	},
+	EXPLOSION_SFX = love.audio.newSource("sfx/explosion.wav"),
+	PLANT_SFX = love.audio.newSource("sfx/mine.wav"),
 	init = function(self, id, x, y, player)
 		self.type = OBJ_TYPE.MINE
 		self.id = id
@@ -23,6 +25,8 @@ Mine = Class{
 		self.fixture:setMask(self.player.id)
 
 		self.sprite = Coin.SUSHI_SPR[math.random(#Coin.SUSHI_SPR)]
+		Mine.PLANT_SFX:stop()
+		Mine.PLANT_SFX:play()
 	end
 }
 
@@ -37,6 +41,8 @@ function Mine:draw()
 end
 
 function Mine:explode()
+	Mine.EXPLOSION_SFX:stop()
+	Mine.EXPLOSION_SFX:play()
 	particles:setPosition(self.pos:unpack())
 	particles:emit(40)
 	for key, mine in pairs(self.player.mines) do
