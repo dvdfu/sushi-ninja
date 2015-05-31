@@ -70,4 +70,9 @@ function Controller:LT()
 	return 0
 end
 
+function Controller:setVibrate(left, right, duration)
+	if self.controller == nil then return end
+	self.controller:setVibration(left,right,duration)
+end
+
 return Controller

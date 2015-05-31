@@ -7,7 +7,8 @@ Mine = Class{
 	SUSHI_SPR = {
 		love.graphics.newImage('img/sushi1.png'),
 		love.graphics.newImage('img/sushi2.png'),
-		love.graphics.newImage('img/sushi3.png')
+		love.graphics.newImage('img/sushi3.png'),
+		love.graphics.newImage('img/sushi4.png')
 	},
 	EXPLOSION_SFX = love.audio.newSource("sfx/explosion.wav"),
 	PLANT_SFX = love.audio.newSource("sfx/mine.wav"),
@@ -49,6 +50,9 @@ function Mine:explode(silent)
 
 		partExplosion:setPosition(self.pos:unpack())
 		partExplosion:emit(40)
+	else
+		partSmoke:setPosition(self.pos:unpack())
+		partSmoke:emit(40)
 	end
 	for key, mine in pairs(self.player.mines) do
 		if key == self.id then
@@ -60,6 +64,7 @@ function Mine:explode(silent)
 					self.player.enemy.body:applyLinearImpulse(-diff.x*Mine.KNOCK_BACK,-diff.y*Mine.KNOCK_BACK)
 					self.player.enemy.hurtTimer = 0.1
 					self.player.enemy:stun()
+					self.player.enemy.controller:setVibrate(1, 1, 0.25)
 				end
 			end
 

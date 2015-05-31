@@ -15,7 +15,7 @@ Player = Class {
 	BLUR_TIMEOUT = 1 / 20,
  	ROTATION_FACTOR = 0.15,
  	MAX_MINES = 3,
-	DASH_SFX = love.audio.newSource("sfx/dash.wav"),
+	DASH_SFX = love.audio.newSource("sfx/swoosh.mp3"),
 	init = function(self, playerNum)
 		self.type = OBJ_TYPE.PLAYER
 		self.id = playerNum
@@ -57,6 +57,9 @@ Player = Class {
 		self.stunTimer = 0
 
 		self.enemy = nil
+
+		partSmoke:setPosition(self.pos:unpack())
+		partSmoke:emit(40)
 	end
 }
 

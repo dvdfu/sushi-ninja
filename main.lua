@@ -108,6 +108,12 @@ function menu:joystickreleased(key, code)
 end
 
 function game:enter()
+	SUSHI_PLATE = love.graphics.newImage('img/sushi_plate.png')
+	SUSHI_COUNTER = love.graphics.newImage('img/sushi_counter.png')
+	TATAMI = love.graphics.newImage('img/tatami.png')
+	KAMON = love.graphics.newImage('img/kamon.png')
+	UI_MARGIN = 40
+
 	--particle generators
 	particleSprite = love.graphics.newImage('img/particle.png')
 
@@ -149,24 +155,41 @@ end
 
 function game:draw()
 	cam:attach()
+	-- for i = 0, 1 do
+	-- 	for j = 0, 1 do
+	-- 		love.graphics.draw(TATAMI, CONSTANTS.SCREEN_WIDTH/2-320+i*320, CONSTANTS.SCREEN_HEIGHT/2-240+j*240, 0, 2, 2)
+	-- 	end
+	-- end
+	love.graphics.setColor(220, 60, 30)
+	love.graphics.draw(KAMON, CONSTANTS.SCREEN_WIDTH/2, CONSTANTS.SCREEN_HEIGHT/2, 0, 3, 2, 77, 77)
+	love.graphics.setColor(255, 255, 255)
 	p1:draw()
 	p2:draw()
 	objSpawner:draw()
 
-	-- Draw labels
-	local playerCoins = {}
-	playerCoins[1] = string.format(CONSTANTS.SCORE_LABEL, 1, p1:getCoins())
-	playerCoins[2] = string.format(CONSTANTS.SCORE_LABEL, 2, p2:getCoins())
-	for p_id, text in pairs(playerCoins) do
-		love.graphics.print(text,
-			CONSTANTS.X_MARGIN + ((p_id - 1) * CONSTANTS.SCREEN_WIDTH / 2),
-			CONSTANTS.SCREEN_HEIGHT - CONSTANTS.Y_MARGIN)
-	end
 	love.graphics.draw(partSmoke)
 	love.graphics.draw(partSparkle)
 	love.graphics.setBlendMode('additive')
 	love.graphics.draw(partExplosion)
 	love.graphics.setBlendMode('alpha')
+
+	love.graphics.setColor(255, 255, 30)
+	love.graphics.draw(SUSHI_PLATE, UI_MARGIN, CONSTANTS.SCREEN_HEIGHT -UI_MARGIN, 0, 2, 2, 0, 16)
+	love.graphics.setColor(30, 255, 255)
+	love.graphics.draw(SUSHI_PLATE, CONSTANTS.SCREEN_WIDTH-UI_MARGIN, CONSTANTS.SCREEN_HEIGHT - UI_MARGIN, 0, 2, 2, 190, 16)
+	love.graphics.setColor(255, 255, 255)
+
+	for i = 0, p1:getCoins()-1 do
+		local sushiX = UI_MARGIN+28+(i%10)*36
+		local sushiY = CONSTANTS.SCREEN_HEIGHT-UI_MARGIN-12-math.floor(i/10)*22
+		love.graphics.draw(SUSHI_COUNTER, sushiX, sushiY, 0, 2, 2, 8, 24)
+	end
+	for i = 0, p2:getCoins()-1 do
+		local sushiX = CONSTANTS.SCREEN_WIDTH-UI_MARGIN-28-(i%10)*36
+		local sushiY = CONSTANTS.SCREEN_HEIGHT-UI_MARGIN-12-math.floor(i/10)*22
+		love.graphics.draw(SUSHI_COUNTER, sushiX, sushiY, 0, 2, 2, 8, 24)
+	end
+
 	cam:detach()
 end
 
@@ -191,14 +214,11 @@ function pause:enter(from)
 end
 
 function pause:draw()
-    local W, H = love.graphics.getWidth(), love.graphics.getHeight()
-    -- draw previous screen
     self.from:draw()
-    -- overlay with pause message
     love.graphics.setColor(0,0,0, 100)
-    love.graphics.rectangle('fill', 0,0, W,H)
+    love.graphics.rectangle('fill', 0,0, CONSTANTS.SCREEN_WIDTH,CONSTANTS.SCREEN_HEIGHT)
     love.graphics.setColor(255,255,255)
-    love.graphics.printf('PAUSE', 0, H/2, W, 'center')
+    love.graphics.printf('PAUSE', 0, CONSTANTS.SCREEN_HEIGHT/2, CONSTANTS.SCREEN_WIDTH, 'center')
 end
 
 -- function pause:keypressed(key)
@@ -213,13 +233,23 @@ function pause:joystickpressed(key, code)
 	end
 end
 
-function over:enter(to, winner)
-    font = love.graphics.getFont()
-    message = "Player " .. winner .. " is the ultimate sushi warrior!\nPress start to duel again."
+function over:enter(to, winner, from)
+	self.from = from
+	local color = ""
+    if winner == 1 then
+    	color = "Yellow"
+    else
+    	color = "Blue"
+    end
+    message = color .. " is the ultimate sushi ninja!\nPress start to duel again."
 end
 
 function over:draw()
-    love.graphics.print(message, love.window.getWidth()/2 - font:getWidth(message)/2, love.window.getHeight()/2 - font:getHeight(message)/2)
+    self.from:draw()
+    love.graphics.setColor(0,0,0, 100)
+    love.graphics.rectangle('fill', 0,0, CONSTANTS.SCREEN_WIDTH,CONSTANTS.SCREEN_HEIGHT)
+    love.graphics.setColor(255,255,255)
+    love.graphics.printf(message, 0, CONSTANTS.SCREEN_HEIGHT/2, CONSTANTS.SCREEN_WIDTH, 'center')
 end
 
 -- function over:keyreleased(key, code)
@@ -236,7 +266,8 @@ end
 
 function love.load()
 	math.randomseed(os.time())
-	love.graphics.setBackgroundColor(90, 80, 70)
+	love.graphics.setNewFont('assets/babyblue.ttf', 64)
+	love.graphics.setBackgroundColor(60, 40, 30)
     Gamestate.registerEvents()
     Gamestate.switch(menu)
 end
@@ -300,7 +331,7 @@ function beginContact(a, b, coll)
 		if player.id ~= mine.player.id then mine:explode(false) end
 	elseif player and coin then
 		if player:collectCoin(coin) >= CONSTANTS.MAX_COINS then
-			Gamestate.switch(over, player.id)
+			Gamestate.switch(over, player.id, game)
 		end
 		objSpawner:deleteItem(coin)
 	end
