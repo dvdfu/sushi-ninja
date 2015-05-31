@@ -176,7 +176,7 @@ function beginContact(a, b, coll)
 	elseif userDataB.type == OBJ_TYPE.COIN then coin = userDataB end
 
 	if player and mine then
-		if player.id ~= mine.player.id then mine:explode() end
+		if player.id ~= mine.player.id then mine:explode(false) end
 	elseif player and coin then
 		if player:collectCoin(coin) >= CONSTANTS.MAX_COINS then
 			Gamestate.switch(over, player.id)

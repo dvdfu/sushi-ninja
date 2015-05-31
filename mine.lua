@@ -41,19 +41,26 @@ function Mine:draw()
 	love.graphics.draw(self.sprite, self.pos.x, self.pos.y, 0, 2, 2, 16, 16)
 end
 
-function Mine:explode()
-	Mine.EXPLOSION_SFX:stop()
-	Mine.EXPLOSION_SFX:play()
-	particles:setPosition(self.pos:unpack())
-	particles:emit(40)
+function Mine:explode(silent)
+	if not silent then
+		Mine.EXPLOSION_SFX:stop()
+		Mine.EXPLOSION_SFX:play()
+		particles:setPosition(self.pos:unpack())
+		particles:emit(40)
+	end
 	for key, mine in pairs(self.player.mines) do
 		if key == self.id then
 			local mine = table.remove(self.player.mines, key)
-			local diff = mine.pos - self.player.enemy.pos
-			if diff:len() < Mine.DANGER_PROXIMITY then
-				self.player.enemy.body:applyLinearImpulse(-diff.x*Mine.KNOCK_BACK,-diff.y*Mine.KNOCK_BACK)
-				self.player.enemy.hurtTimer = 0.1
+
+			if not silent then
+				local diff = mine.pos - self.player.enemy.pos
+				if diff:len() < Mine.DANGER_PROXIMITY then
+					self.player.enemy.body:applyLinearImpulse(-diff.x*Mine.KNOCK_BACK,-diff.y*Mine.KNOCK_BACK)
+					self.player.enemy.hurtTimer = 0.1
+					self.player.enemy:stun()
+				end
 			end
+
 			mine.body:destroy()
 			self.player.minesCount = self.player.minesCount - 1
 			for key, mine in pairs(self.player.mines) do mine:setId(key) end
