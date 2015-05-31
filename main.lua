@@ -10,12 +10,17 @@ function love.load()
 	world = love.physics.newWorld(0, 0, true)
     world:setCallbacks(beginContact, endContact, preSolve, postSolve)
 
+	OBJ_TYPE = {}
+	OBJ_TYPE.PLAYER = 'PLAYER'
+	OBJ_TYPE.MINE = 'MINE'
+	OBJ_TYPE.COIN = 'COIN'
+
 	p1 = Player(1)
 	p2 = Player(2)
 	p1:setEnemy(p2)
 	p2:setEnemy(p1)
 	objSpawner = ObjSpawner()
-	objSpawner:addSpawn('COIN', 3)
+	objSpawner:addSpawn(OBJ_TYPE.COIN, 0.05)
 end
 
 function love.update(dt)
@@ -35,9 +40,6 @@ function love.draw()
 end
 
 function beginContact(a, b, coll)
-	local PLAYER_TYPE = 'PLAYER'
-	local MINE_TYPE = 'MINE'
-	local COIN_TYPE = 'COIN'
 	local userDataA = a:getUserData()
 	local userDataB = b:getUserData()
 	if userDataA.type == userDataB.type then return end
@@ -45,21 +47,19 @@ function beginContact(a, b, coll)
 	local mine
 	local coin
 
-	if userDataA.type == PLAYER_TYPE then
+	if userDataA.type == OBJ_TYPE.PLAYER then
 		player = userDataA
-	elseif userDataA.type == MINE_TYPE then
+	elseif userDataA.type == OBJ_TYPE.MINE then
 		mine = userDataA
-	elseif userDataA.type == COIN_TYPE then
-		print('coin is A')
+	elseif userDataA.type == OBJ_TYPE.COIN then
 		coin = userDataA
 	end
 
-	if userDataB.type == PLAYER_TYPE then
+	if userDataB.type == OBJ_TYPE.PLAYER then
 		player = userDataB
-	elseif userDataB.type == MINE_TYPE then
+	elseif userDataB.type == OBJ_TYPE.MINE then
 		mine = userDataB
-	elseif userDataB.type == COIN_TYPE then
-		print('coin is B')
+	elseif userDataB.type == OBJ_TYPE.COIN then
 		coin = userDataB
 	end
 
@@ -69,7 +69,6 @@ function beginContact(a, b, coll)
 			mine:explode()
 		end
 	elseif player and coin then
-		print('got coin')
 		player:collectCoin(coin)
 		objSpawner:deleteItem(coin)
 	end

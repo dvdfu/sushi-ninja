@@ -5,7 +5,6 @@ Coin = require 'coin'
 
 ObjSpawner = Class {
 	init = function(self)
-		math.randomseed(os.time())
 		self.xBound, self.yBound = love.graphics.getDimensions()
 		self.objsToSpawn = {}
 		self.spawner = {}
@@ -35,7 +34,7 @@ function ObjSpawner:spawnObj(objType)
 	local yPos = math.random() * self.yBound
 	local objPos = Vector(xPos, yPos)
 	-- Determine which object to create.
-	if objType == Coin.OBJ_TYPE then
+	if objType == OBJ_TYPE.COIN then
 		obj = Coin(objPos)
 	else
 		obj = 0
@@ -60,8 +59,9 @@ end
 
 -- Deletes a single item from a list of objects (e.g. coins)
 function ObjSpawner:deleteItem(obj)
-	objType = obj.TYPE
+	objType = obj.type
 	objId = obj.id
+	obj:delete()
 	self.objsToSpawn[objType][objId] = 0
 end
 return ObjSpawner
