@@ -45,8 +45,9 @@ function Mine:explode(silent)
 	if not silent then
 		Mine.EXPLOSION_SFX:stop()
 		Mine.EXPLOSION_SFX:play()
-		particles:setPosition(self.pos:unpack())
-		particles:emit(40)
+
+		partExplosion:setPosition(self.pos:unpack())
+		partExplosion:emit(40)
 	end
 	for key, mine in pairs(self.player.mines) do
 		if key == self.id then

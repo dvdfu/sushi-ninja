@@ -33,16 +33,26 @@ function menu:joystickreleased(key, code)
 end
 
 function game:enter()
+	--particle generators
 	local particleSprite = love.graphics.newImage('img/particle.png')
-	particles = love.graphics.newParticleSystem(particleSprite, 300)
-	particles:setAreaSpread('normal', 30, 30)
-	particles:setParticleLifetime(0.1, 0.7)
-	particles:setDirection(-math.pi / 2)
-	particles:setSpread(math.pi / 3)
-	particles:setSpeed(0, 500)
-	particles:setColors(255, 255, 255, 255, 255, 255, 0, 255, 255, 30, 0, 128)
-	particles:setSizes(2, 0)
-	-- particles:setLinearAcceleration(0, 0, 0, 1000)
+	partExplosion = love.graphics.newParticleSystem(particleSprite, 300)
+	partExplosion:setAreaSpread('normal', 4, 4)
+	partExplosion:setParticleLifetime(0, 1)
+	partExplosion:setDirection(-math.pi / 2)
+	partExplosion:setSpread(math.pi / 2)
+	partExplosion:setSpeed(100, 500)
+	partExplosion:setColors(255, 255, 255, 255, 255, 255, 0, 255, 255, 30, 0, 255, 255, 0, 0, 128)
+	partExplosion:setSizes(2, 0)
+	partExplosion:setLinearAcceleration(0, 500, 0, 1000)
+
+	partSmoke = love.graphics.newParticleSystem(particleSprite, 300)
+	partSmoke:setAreaSpread('normal', 4, 4)
+	partSmoke:setParticleLifetime(0, 0.5)
+	partSmoke:setSpread(math.pi * 2)
+	partSmoke:setSpeed(0, 200)
+	partSmoke:setColors(180, 180, 180, 255, 60, 60, 60, 255)
+	partSmoke:setSizes(3, 0)
+
 	love.physics.setMeter(64)
 	world = love.physics.newWorld(0, 0, true)
     world:setCallbacks(beginContact, endContact, preSolve, postSolve)
@@ -57,7 +67,8 @@ end
 
 function game:update(dt)
 	world:update(dt)
-	particles:update(dt)
+	partExplosion:update(dt)
+	partSmoke:update(dt)
 	p1:update(dt)
 	p2:update(dt)
 	objSpawner:update(dt)
@@ -77,8 +88,9 @@ function game:draw()
 			CONSTANTS.X_MARGIN + ((p_id - 1) * CONSTANTS.SCREEN_WIDTH / 2),
 			CONSTANTS.SCREEN_HEIGHT - CONSTANTS.Y_MARGIN)
 	end
+	love.graphics.draw(partSmoke)
 	love.graphics.setBlendMode('additive')
-	love.graphics.draw(particles)
+	love.graphics.draw(partExplosion)
 	love.graphics.setBlendMode('alpha')
 end
 
