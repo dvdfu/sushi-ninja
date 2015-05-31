@@ -58,7 +58,7 @@ function game:draw()
 	playerCoins[2] = string.format(CONSTANTS.SCORE_LABEL, 2, p2:getCoins())
 	for p_id, text in pairs(playerCoins) do
 		love.graphics.print(text,
-			CONSTANTS.X_MARGIN + ((p_id - 1) * 500),
+			CONSTANTS.X_MARGIN + ((p_id - 1) * CONSTANTS.SCREEN_WIDTH / 2),
 			CONSTANTS.SCREEN_HEIGHT - CONSTANTS.Y_MARGIN)
 	end
 end
