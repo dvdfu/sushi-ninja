@@ -8,6 +8,7 @@ CONSTANTS = Class {
 	COIN_SPAWN_FREQUENCY = 1.5,
 	PLAYER_COIN_FIXTURE_GROUP = 1,
 	NUM_PLAYERS = 2,
+	MAX_COINS = 5,
 	SCORE_LABEL = 'Player %i: %i Sushi'
 }
 

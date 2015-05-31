@@ -11,6 +11,7 @@ Mine = Class{
 	},
 	EXPLOSION_SFX = love.audio.newSource("sfx/explosion.wav"),
 	PLANT_SFX = love.audio.newSource("sfx/mine.wav"),
+
 	init = function(self, id, x, y, player)
 		self.type = OBJ_TYPE.MINE
 		self.id = id
