@@ -1,4 +1,5 @@
 Class = require 'lib.class'
+Vector = require 'lib.vector'
 
 CONSTANTS = Class {
 	SCREEN_WIDTH = love.graphics.getWidth(),
@@ -19,6 +20,11 @@ OBJ_TYPE = {
 	PLAYER = 'PLAYER',
 	MINE = 'MINE',
 	COIN = 'COIN'
+}
+
+P_COLOUR = {
+	{r = 255, g = 255, b = 0},
+	{r = 0, g = 255, b = 255}
 }
 
 return CONSTANTS

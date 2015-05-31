@@ -158,10 +158,6 @@ function Player:update(dt)
 
 end
 
-function Player:menuUpdate(dt)
-	self.anim:update(dt)
-end
-
 function Player:draw()
 	local sWidth, sHeight = CONSTANTS.SCREEN_WIDTH, CONSTANTS.SCREEN_HEIGHT
 
@@ -175,8 +171,7 @@ function Player:draw()
 end
 
 function Player:drawOffset(ox, oy)
-	if self.id == 1 then love.graphics.setColor(255, 255, 0)
-	else love.graphics.setColor(0, 255, 255) end
+	love.graphics.setColor(P_COLOUR[self.id].r, P_COLOUR[self.id].g, P_COLOUR[self.id].b)
 
 	local sWidth, sHeight = CONSTANTS.SCREEN_WIDTH, CONSTANTS.SCREEN_HEIGHT
 

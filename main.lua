@@ -5,7 +5,9 @@ ObjSpawner = require 'obj_spawner'
 Gamestate = require 'lib.gamestate'
 CONSTANTS = require 'constants'
 Controller = require 'controller'
-Camera = require "lib.camera"
+Camera = require 'lib.camera'
+Vector = require 'lib.vector'
+Coin = require 'coin'
 
 local menu = {}
 local game = {}
@@ -14,36 +16,83 @@ local over = {}
 
 function menu:enter()
 	font = love.graphics.getFont()
-	message = "Press START to play!"
-	world = love.physics.newWorld(0, 0, true)
-    world:setCallbacks(beginContact, endContact, preSolve, postSolve)
-	p1 = Player(1)
-	p2 = Player(2)
+	message = 'Press START to play!'
+	sushiTimer = 0
+
+	idlePlayerAnim = newAnimation(Player.IDLE_SPR, 32, 32, 0.4, 0)
+	menuCoins = {{}, {}}
+	local sWidth, sHeight = CONSTANTS.SCREEN_WIDTH, CONSTANTS.SCREEN_HEIGHT
+	for i = 1, 20 do
+		for id in pairs(menuCoins) do
+			local sprite = Coin.SUSHI_SPR[math.random(#Coin.SUSHI_SPR)]
+			local posX = i * sWidth / 20
+			local posY = (id * 3 - 2) * sHeight / 5
+			spriteData = {
+				spr = sprite,
+				pos = Vector(posX, posY)
+			}
+			menuCoins[id][i] = spriteData
+		end
+	end
 
 	particleSprite = love.graphics.newImage('img/particle.png')
 	genPartSmoke()
-
-	menuObjSpawner = ObjSpawner()
-	menuObjSpawner:addSpawn(OBJ_TYPE.COIN, 1.0/60, 50, 50)
 end
 
 function menu:update(dt)
-	p1:menuUpdate(dt)
-	p2:menuUpdate(dt)
-	menuObjSpawner:update(dt)
+	local sWidth, sHeight = CONSTANTS.SCREEN_WIDTH, CONSTANTS.SCREEN_HEIGHT
+	idlePlayerAnim:update(dt)
+	if sushiTimer < 1 then
+		sushiTimer = sushiTimer + dt*0.7
+	else
+		sushiTimer = sushiTimer - 1
+	end
+
+	for id in pairs(menuCoins) do
+		for i = 1, 20 do
+			direction = (id * 2) - 3
+			print('DIRECTION: ', direction)
+			menuCoins[id][i].pos.x = menuCoins[id][i].pos.x + (direction * 5)
+			if menuCoins[id][i].pos.x < 0 then
+				menuCoins[id][i].pos.x = menuCoins[id][i].pos.x + sWidth
+			elseif menuCoins[id][i].pos.x > sWidth then
+				menuCoins[id][i].pos.x = menuCoins[id][i].pos.x - sWidth
+			end
+		end
+	end
+
 end
 
 function menu:draw()
 	love.graphics.print(message, love.window.getWidth()/2 - font:getWidth(message)/2, love.window.getHeight()/2 - font:getHeight(message)/2)
-	p1:draw()
-	p2:draw()
-	menuObjSpawner:draw(dt)
+	for i = 1, CONSTANTS.NUM_PLAYERS do
+		love.graphics.setColor(P_COLOUR[i].r, P_COLOUR[i].g, P_COLOUR[i].b)
+		idlePlayerAnim:draw((i * 2 - 1) * CONSTANTS.SCREEN_WIDTH / 4,
+			CONSTANTS.SCREEN_HEIGHT / 2, 0, 2, 2, 16, 16)
+	end
+
+	for id in pairs(menuCoins) do
+		for i = 1, 20 do
+			local spr = menuCoins[id][i].spr
+			local pos = menuCoins[id][i].pos
+			love.graphics.setColor(0, 0, 0, 128)
+			love.graphics.draw(Coin.SHADOW_SPR, pos.x, pos.y+8, 0, 2, 2, 16, 16)
+			love.graphics.setColor(255, 255, 255, 255)
+			love.graphics.draw(spr, pos.x, pos.y + 4 * math.sin(sushiTimer * math.pi * 2), 0, 2, 2, 16, 16)
+		end
+	end
+
+	love.graphics.setColor(255, 255, 255)
 end
 
 function menu:leave()
-	-- world:destroy()
-	p1 = nil
-	p2 = nil
+	for id in pairs(menuCoins) do
+		for i = 1, 20 do
+			menuCoins[id][i] = nil
+		end
+		menuCoins[id] = nil
+	end
+	menuCoins = nil
 end
 
 function menu:keyreleased(key, code)
@@ -70,8 +119,8 @@ function game:enter()
 	cam = Camera(love.window.getWidth()/2, love.window.getHeight()/2)
 
 	love.physics.setMeter(64)
-	-- world = love.physics.newWorld(0, 0, true)
-	-- 		world:setCallbacks(beginContact, endContact, preSolve, postSolve)
+	world = love.physics.newWorld(0, 0, true)
+			world:setCallbacks(beginContact, endContact, preSolve, postSolve)
 
 	p1 = Player(1)
 	p2 = Player(2)
