@@ -51,6 +51,16 @@ function game:draw()
 	p1:draw()
 	p2:draw()
 	objSpawner:draw()
+
+	-- Draw labels
+	local playerCoins = {}
+	playerCoins[1] = string.format(CONSTANTS.SCORE_LABEL, 1, p1:getCoins())
+	playerCoins[2] = string.format(CONSTANTS.SCORE_LABEL, 2, p2:getCoins())
+	for p_id, text in pairs(playerCoins) do
+		love.graphics.print(text,
+			CONSTANTS.X_MARGIN + ((p_id - 1) * CONSTANTS.SCREEN_WIDTH / 2),
+			CONSTANTS.SCREEN_HEIGHT - CONSTANTS.Y_MARGIN)
+	end
 end
 
 function game:keypressed(key, code)

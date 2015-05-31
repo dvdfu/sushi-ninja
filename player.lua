@@ -50,8 +50,6 @@ Player = Class {
 		self.preT = 0
 		self.hurtTimer = 0
 
-		self.coinCount = 0
-
 		self.enemy = nil
 	end
 }
@@ -60,9 +58,10 @@ function Player:update(dt)
 	self.anim:update(dt)
 	local lsx, lsy = self.controller:LSX(), self.controller:LSY()
 	local rsx, rsy = self.controller:RSX(), self.controller:RSY()
+	local sWidth, sHeight = CONSTANTS.SCREEN_WIDTH, CONSTANTS.SCREEN_HEIGHT
 
 	self.vel = Vector(0, 0)
-	if self.cursorTimer == 0 then self.vel = self.vel + Vector(self.controller:LSX(), self.controller:LSY()) * Player.SPEED end
+	if self.cursorTimer == 0 then self.vel = self.vel + Vector(lsx, lsy) * Player.SPEED end
 
 	if self.vel:len() > 0 then self.anim = self.runAnim
 	else self.anim = self.idleAnim end
@@ -110,21 +109,68 @@ function Player:update(dt)
 		self:dropMine()
 		self.preT = love.timer.getTime()
 	end
+
+
+	-- KEYBOARD CONTROLS: UNCOMMENT TO USE
+	-- if love.keyboard.isDown('w') then
+	-- 	self.body:setPosition(self.pos.x, self.pos.y - 7)
+	-- end
+	-- if love.keyboard.isDown('a') then
+	-- 	self.body:setPosition(self.pos.x - 7, self.pos.y)
+	-- end
+	-- if love.keyboard.isDown('s') then
+	-- 	self.body:setPosition(self.pos.x, self.pos.y + 7)
+	-- end
+	-- if love.keyboard.isDown('d') then
+	-- 	self.body:setPosition(self.pos.x + 7, self.pos.y)
+	-- end
+
+	if self.pos.x < 0 then
+		self.body:setPosition(self.pos.x + sWidth, self.pos.y)
+	elseif self.pos.x > sWidth then
+		self.body:setPosition(self.pos.x - sWidth, self.pos.y)
+	end
+
+	if self.pos.y < 0 then
+		self.body:setPosition(self.pos.x, self.pos.y + sHeight)
+	elseif self.pos.y > sHeight then
+		self.body:setPosition(self.pos.x, self.pos.y - sHeight)
+	end
+
+
 end
 
 function Player:draw()
+	local sWidth, sHeight = CONSTANTS.SCREEN_WIDTH, CONSTANTS.SCREEN_HEIGHT
+
+	self:drawOffset(0, 0)
+	if self.pos.x < sWidth / 2 then
+		self:drawOffset(sWidth, 0)
+	else
+		self:drawOffset(-sWidth, 0)
+	end
+	if self.pos.y < sHeight / 2 then
+		self:drawOffset(0, sHeight)
+	else
+		self:drawOffset(0, -sHeight)
+	end
+end
+
+function Player:drawOffset(ox, oy)
+	local sWidth, sHeight = CONSTANTS.SCREEN_WIDTH, CONSTANTS.SCREEN_HEIGHT
+
 	for key, mine in pairs(self.mines) do mine:draw() end
 	if self.cursor then
 		local cursorPos = self.cursorRadius * Vector(math.cos(self.cursorAngle), math.sin(self.cursorAngle))
-		love.graphics.circle('line', self.pos.x + cursorPos.x, self.pos.y + cursorPos.y, 16)
+		love.graphics.circle('line', self.pos.x + cursorPos.x + ox, self.pos.y + cursorPos.y + oy, 16)
 	end
 
 	if self.id == 1 then love.graphics.setColor(255, 255, 0)
 	else love.graphics.setColor(0, 255, 255) end
 
-	if self.cursorTimer > 0 then love.graphics.draw(Player.BLUR_SPR, self.oldPos.x, self.oldPos.y, self.cursorAngle, (self.cursorRadius + 16) / 128, 2, 0, 16) end
+	if self.cursorTimer > 0 then love.graphics.draw(Player.BLUR_SPR, self.oldPos.x + ox, self.oldPos.y + oy, self.cursorAngle, (self.cursorRadius + 16) / 128, 2, 0, 16) end
 
-	self.anim:draw(self.body:getX(), self.body:getY(), 0, 2 * self.direction, 2, 16, 16)
+	self.anim:draw(self.body:getX() + ox, self.body:getY() + oy, 0, 2 * self.direction, 2, 16, 16)
 	love.graphics.setColor(255, 255, 255)
 end
 
@@ -140,14 +186,17 @@ function Player:getMines()
 end
 
 function Player:collectCoin()
-	self.coinCount = self.coinCount + 1
-	print('Player ', self.id, ': ', self.coinCount, ' coins')
-	return self.coinCount
+	self.coins = self.coins + 1
+	print('Player ', self.id, ': ', self.coins, ' coins')
+	return self.coins
 end
 
 function Player:setEnemy(enemy)
 	self.enemy = enemy
 end
 
+function Player:getCoins()
+	return self.coins
+end
 
 return Player
