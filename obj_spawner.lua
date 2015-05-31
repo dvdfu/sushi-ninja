@@ -2,6 +2,7 @@ Class = require 'lib.class'
 Vector = require 'lib.vector'
 Timer = require 'lib.timer'
 Coin = require 'coin'
+Wasabi = require 'wasabi'
 
 ObjSpawner = Class {
 	init = function(self)
@@ -72,6 +73,8 @@ function ObjSpawner:spawnObj(objType)
 	-- Determine which object to create.
 	if objType == OBJ_TYPE.COIN then
 		obj = Coin(objPos)
+	elseif objType == OBJ_TYPE.WASABI then
+		obj = Wasabi(objPos)
 	else
 		obj = 0
 	end

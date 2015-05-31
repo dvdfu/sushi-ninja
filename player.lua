@@ -43,7 +43,7 @@ Player = Class {
 		self.fixture:setUserData(self)
 		self.fixture:setCategory(self.id)
 		self.fixture:setMask(self.id)
-		self.fixture:setGroupIndex(CONSTANTS.PLAYER_COIN_FIXTURE_GROUP)
+		self.fixture:setGroupIndex(CONSTANTS.PLAYER_INTERACTABLE_FIXTURE_GROUP)
 
  		self.idleAnim = newAnimation(Player.IDLE_SPR, 32, 32, 0.4, 0)
  		self.runAnim = newAnimation(Player.RUN_SPR, 32, 32, 0.1, 0)
@@ -254,6 +254,10 @@ end
 
 function Player:isSpiced()
 	return self.wasabiTimer > 0
+end
+
+function Player:eatSpice(secondsSpiced)
+	self.wasabiTimer = secondsSpiced
 end
 
 function Player:stun()

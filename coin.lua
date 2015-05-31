@@ -29,7 +29,7 @@ Coin = Class {
 		self.fixture = love.physics.newFixture(self.body, self.shape)
 		self.fixture:setUserData(self)
 		self.fixture:setSensor(true)
-		self.fixture:setGroupIndex(CONSTANTS.PLAYER_COIN_FIXTURE_GROUP)
+		self.fixture:setGroupIndex(CONSTANTS.PLAYER_INTERACTABLE_FIXTURE_GROUP)
 
 		partSmoke:setPosition(self.pos:unpack())
 		partSmoke:emit(40)
