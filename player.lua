@@ -244,6 +244,7 @@ end
 
 function Player:collectCoin()
 	if self:isSpiced() then return end
+	if self.coins == CONSTANTS.MAX_COINS then return self.coins end
 	self.coins = self.coins + 1
 	return self.coins
 end

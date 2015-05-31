@@ -50,10 +50,10 @@ function menu:update(dt)
 		for i = 1, 20 do
 			direction = (id * 2) - 3
 			menuCoins[id][i].pos.x = menuCoins[id][i].pos.x + (direction * 5)
-			if menuCoins[id][i].pos.x < 0 then
-				menuCoins[id][i].pos.x = menuCoins[id][i].pos.x + sWidth
-			elseif menuCoins[id][i].pos.x > sWidth then
-				menuCoins[id][i].pos.x = menuCoins[id][i].pos.x - sWidth
+			if menuCoins[id][i].pos.x < -32 then
+				menuCoins[id][i].pos.x = menuCoins[id][i].pos.x + sWidth + 32
+			elseif menuCoins[id][i].pos.x > sWidth + 32 then
+				menuCoins[id][i].pos.x = menuCoins[id][i].pos.x - sWidth - 32
 			end
 		end
 	end
