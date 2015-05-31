@@ -61,9 +61,9 @@ function game:update(dt)
 	p1:update(dt)
 	p2:update(dt)
 	objSpawner:update(dt)
-	if p1.coinCount > 4 then
+	if p1.coins > 4 then
 		Gamestate.switch(over, p1.id)
-	elseif p2.coinCount > 4 then
+	elseif p2.coins > 4 then
 		Gamestate.switch(over, p2.id)
 	end
 end
