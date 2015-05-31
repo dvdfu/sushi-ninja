@@ -3,7 +3,6 @@ Vector = require 'lib.vector'
 
 Coin = Class {
 	RADIUS = 32,
-	INI_ID = 1,
 	SUSHI_SPR = {
 		love.graphics.newImage('img/sushi1.png'),
 		love.graphics.newImage('img/sushi2.png'),
@@ -11,16 +10,17 @@ Coin = Class {
 	},
 	SHADOW_SPR = love.graphics.newImage('img/shadow.png'),
 	PICKUP_SFX = love.audio.newSource("sfx/sushi.wav"),
+	iniId = 1,
 
 	init = function(self, pos)
 		self.type = OBJ_TYPE.COIN
 		self.pos = pos
-		self.id = Coin.INI_ID
+		self.id = Coin.iniId
 		self.sprite = Coin.SUSHI_SPR[math.random(#Coin.SUSHI_SPR)]
 
 		self.timer = 0
 
-		Coin.INI_ID = Coin.INI_ID + 1
+		Coin.iniId = Coin.iniId + 1
 
 		-- Coin Physics
 		self.body = love.physics.newBody(world, self.pos.x, self.pos.y, 'static')
