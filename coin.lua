@@ -4,12 +4,17 @@ Vector = require 'lib.vector'
 Coin = Class {
 	RADIUS = 5,
 	INI_ID = 1,
-	SUSHI1_SPR = love.graphics.newImage('img/sushi1.png'),
-	SUSHI2_SPR = love.graphics.newImage('img/sushi2.png'),
+	SUSHI_SPR = {
+		love.graphics.newImage('img/sushi1.png'),
+		love.graphics.newImage('img/sushi2.png'),
+		love.graphics.newImage('img/sushi3.png')
+	},
 	init = function(self, pos)
 		self.type = OBJ_TYPE.COIN
 		self.pos = pos
 		self.id = Coin.INI_ID
+		self.sprite = Coin.SUSHI_SPR[math.random(#Coin.SUSHI_SPR)]
+
 		Coin.INI_ID = Coin.INI_ID + 1
 
 		-- Coin Physics
@@ -30,7 +35,7 @@ function Coin:draw()
 	-- love.graphics.setColor(255, 255, 0)
 	-- love.graphics.circle('line', self.pos.x, self.pos.y, Coin.RADIUS, 10)
 	-- love.graphics.setColor(255, 255, 255)
-	love.graphics.draw(Coin.SUSHI1_SPR, self.pos.x, self.pos.y, 0, 2, 2, 16, 16)
+	love.graphics.draw(self.sprite, self.pos.x, self.pos.y, 0, 2, 2, 16, 16)
 end
 
 function Coin:delete()
