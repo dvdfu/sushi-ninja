@@ -27,6 +27,17 @@ function menu:keyreleased(key, code)
 end
 
 function game:enter()
+	local particleSprite = love.graphics.newImage('img/particle.png')
+	particles = love.graphics.newParticleSystem(particleSprite, 300)
+	particles:setPosition(love.graphics.getWidth() / 2, love.graphics.getHeight())
+	particles:setAreaSpread('normal', love.graphics.getWidth() / 2, 0)
+	particles:setParticleLifetime(0, 0.5)
+	particles:setDirection(-math.pi / 2)
+	particles:setSpeed(160, 300)
+	particles:setColors(255, 0, 0, 255, 255, 120, 0, 255, 255, 200, 0, 255)
+	particles:setEmissionRate(2000)
+	particles:setSizes(1, 0.5)
+
 	love.physics.setMeter(64)
 	world = love.physics.newWorld(0, 0, true)
     world:setCallbacks(beginContact, endContact, preSolve, postSolve)
@@ -91,7 +102,7 @@ end
 
 function love.load()
 	math.randomseed(os.time())
-	love.graphics.setBackgroundColor(40, 60, 80)
+	love.graphics.setBackgroundColor(90, 80, 70)
     Gamestate.registerEvents()
     Gamestate.switch(menu)
 end

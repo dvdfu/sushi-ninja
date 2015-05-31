@@ -8,7 +8,8 @@ Player = Class {
 	SPEED = 300,
 	IDLE_SPR = love.graphics.newImage('img/player_idle.png'),
 	RUN_SPR = love.graphics.newImage('img/player_run.png'),
-	BLUR_SPR = love.graphics.newImage('img/blur.png'),
+	SHADOW_SPR = love.graphics.newImage('img/shadow.png'),
+	BLUR_SPR = love.graphics.newImage('img/blur2.png'),
 	BLUR_TIMEOUT = 1 / 20,
  	ROTATION_FACTOR = 0.15,
 	DASH_SFX = love.audio.newSource("sfx/dash.wav"),
@@ -87,9 +88,10 @@ function Player:update(dt)
  	    self.cursorLastAngle = angle
      	self.cursorAngle = (angle*Player.ROTATION_FACTOR) + (self.cursorAngle*(1.0 - Player.ROTATION_FACTOR))
 
-		if rsx == 0 and rsy == 0 then self.cursor = false
-		--on dash
-		elseif self.controller:RB() then
+		if rsx == 0 and rsy == 0 then
+			self.cursor = false
+			self.cursorRadius = 0
+		elseif self.controller:RB() then --on dash
 			Player.DASH_SFX:stop()
 			Player.DASH_SFX:play()
 			self.cursor = false
@@ -101,7 +103,7 @@ function Player:update(dt)
 		if self.cursorTimer == 0 and not self.controller:RB() and (rsx ~= 0 or rsy ~= 0) then
 			self.cursor = true
 			self.cursorRadius = 0
-			self.cursorVelocity = 10
+			self.cursorVelocity = 16
 		end
 	end
 

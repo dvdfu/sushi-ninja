@@ -9,6 +9,7 @@ Coin = Class {
 		love.graphics.newImage('img/sushi2.png'),
 		love.graphics.newImage('img/sushi3.png')
 	},
+	SHADOW_SPR = love.graphics.newImage('img/shadow.png'),
 	init = function(self, pos)
 		self.type = OBJ_TYPE.COIN
 		self.pos = pos
@@ -31,6 +32,9 @@ function Coin:update(dt)
 end
 
 function Coin:draw()
+	love.graphics.setColor(0, 0, 0, 128)
+	love.graphics.draw(Coin.SHADOW_SPR, self.pos.x, self.pos.y+8, 0, 2, 2, 16, 16)
+	love.graphics.setColor(255, 255, 255, 255)
 	love.graphics.draw(self.sprite, self.pos.x, self.pos.y, 0, 2, 2, 16, 16)
 end
 
