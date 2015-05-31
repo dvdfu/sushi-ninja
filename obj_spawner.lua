@@ -9,7 +9,7 @@ ObjSpawner = Class {
 		height = CONSTANTS.SCREEN_HEIGHT
 		self.xBound = width - CONSTANTS.X_MARGIN
 		self.yBound = height - CONSTANTS.Y_MARGIN
-		self.objsToSpawn = {}
+		self.objsSpawned = {}
 		self.objTableSizes = {}
 		self.objTableMaxSizes = {}
 		self.spawner = {}
@@ -18,13 +18,13 @@ ObjSpawner = Class {
 }
 
 function ObjSpawner:addSpawn(objType, spawnInterval, maxQtyOnScreen, qty)
-	if self.objsToSpawn[objType] ~= nil then
+	if self.objsSpawned[objType] ~= nil then
 		self:removeSpawn(objType)
 	end
 	if maxQtyOnScreen == nil then
 		maxQtyOnScreen = CONSTANTS.DEFAULT_MAX_ITEMS_ON_SCREEN
 	end
-	self.objsToSpawn[objType] = {}
+	self.objsSpawned[objType] = {}
 	self.objTableSizes[objType] = 0
 	self.objTableMaxSizes[objType] = maxQtyOnScreen
 	self.spawner[objType] = self.objSpawnerTimer.addPeriodic(spawnInterval, function() self:spawnObj(objType) end, qty)
@@ -35,7 +35,14 @@ function ObjSpawner:removeSpawn(objType)
 end
 
 function ObjSpawner:clearAll()
-	self.objsToSpawn = nil
+	for objType in self.objsSpawned do
+		for objId in self.objsSpawned[objType] do
+			if self.objsSpawned[objType][id] ~= 0 then
+				self:deleteItem(self.objsSpawned[objType][id])
+			end
+		end
+	end
+	self.objsSpawned = nil
 	self.objTableSizes = nil
 	self.objTableMaxSizes = nil
 	self.spawner = nil
@@ -54,17 +61,17 @@ function ObjSpawner:spawnObj(objType)
 	else
 		obj = 0
 	end
-	table.insert(self.objsToSpawn[objType], obj)
+	self.objsSpawned[objType][obj.id] = obj
 	self.objTableSizes[objType] = self.objTableSizes[objType] + 1
 end
 
 function ObjSpawner:update(dt)
 	self.objSpawnerTimer.update(dt)
 	-- Update spawned objects
-	for k, objs in pairs(self.objsToSpawn) do
+	for k, objs in pairs(self.objsSpawned) do
 		for l, obj in pairs(objs) do
 			if obj ~= 0 then
-				self.objsToSpawn[k][l]:update(dt)
+				self.objsSpawned[k][l]:update(dt)
 			end
 		end
 	end
@@ -72,10 +79,10 @@ end
 
 function ObjSpawner:draw()
 	-- Draw spawned objects
-	for k, objs in pairs(self.objsToSpawn) do
+	for k, objs in pairs(self.objsSpawned) do
 		for l, obj in pairs(objs) do
 			if obj ~= 0 then
-				self.objsToSpawn[k][l]:draw()
+				self.objsSpawned[k][l]:draw()
 			end
 		end
 	end
@@ -86,8 +93,8 @@ function ObjSpawner:deleteItem(obj)
 	objType = obj.type
 	objId = obj.id
 	obj:delete()
-	if self.objsToSpawn[objType] and self.objsToSpawn[objType][objId] then
-		self.objsToSpawn[objType][objId] = 0
+	if self.objsSpawned[objType] and self.objsSpawned[objType][objId] then
+		self.objsSpawned[objType][objId] = 0
 		self.objTableSizes[objType] = self.objTableSizes[objType] - 1
 	end
 end
