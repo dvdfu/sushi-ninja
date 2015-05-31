@@ -9,7 +9,7 @@ Player = Class {
 	BLUR_TIMEOUT = 1 / 20,
  	ROTATION_FACTOR = 0.15,
 	init = function(self, playerNum)
-		self.type = 'PLAYER'
+		self.type = OBJ_TYPE.PLAYER
 		self.id = playerNum
 		self.pos = Vector(playerNum*475, 420)
 		self.oldPos = self.pos
@@ -135,7 +135,7 @@ end
 
 function Player:collectCoin()
 	self.coinCount = self.coinCount + 1
-	print(self.coinCount)
+	print('Player ', self.id, ': ', self.coinCount, ' coins')
 	return self.coinCount
 end
 
