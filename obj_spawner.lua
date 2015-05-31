@@ -58,4 +58,10 @@ function ObjSpawner:draw()
 	end
 end
 
+-- Deletes a single item from a list of objects (e.g. coins)
+function ObjSpawner:deleteItem(obj)
+	objType = obj.TYPE
+	objId = obj.id
+	self.objsToSpawn[objType][objId] = 0
+end
 return ObjSpawner
