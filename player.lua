@@ -15,7 +15,8 @@ Player = Class {
 	BLUR_TIMEOUT = 1 / 15,
  	ROTATION_FACTOR = 0.15,
  	MAX_MINES = 3,
-	DASH_SFX = love.audio.newSource("sfx/swoosh.mp3"),
+	DASH_SFX = love.audio.newSource('sfx/swoosh.mp3'),
+	WASABI_SFX = love.audio.newSource('sfx/fizz.mp3'),
 	init = function(self, playerNum)
 		self.type = OBJ_TYPE.PLAYER
 		self.id = playerNum
@@ -258,6 +259,8 @@ end
 
 function Player:eatSpice(secondsSpiced)
 	self.wasabiTimer = secondsSpiced
+	Player.WASABI_SFX:stop()
+	Player.WASABI_SFX:play()
 end
 
 function Player:stun()
