@@ -6,6 +6,7 @@ Controller = Class {
 		self.num = i
 		self.controller = love.joystick.getJoysticks()[i]
 		if self.controller then
+			self.canVibrate = self.controller:isVibrationSupported()
 			_, self.rBumper = self.controller:getGamepadMapping('rightshoulder')
 			_, self.lBumper = self.controller:getGamepadMapping('leftshoulder')
 			_, self.start = self.controller:getGamepadMapping('start')
@@ -68,6 +69,11 @@ function Controller:LT()
 	local l = self.controller:getGamepadAxis('triggerleft') or 0
 	if math.abs(l) > Controller.buffer then return l end
 	return 0
+end
+
+function Controller:setVibrate(left, right, duration)
+	if self.controller == nil then return end
+	self.controller:setVibration(left,right,duration)
 end
 
 return Controller
