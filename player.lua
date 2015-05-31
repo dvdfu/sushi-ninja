@@ -23,6 +23,7 @@ Player = Class {
 			CONSTANTS.SCREEN_HEIGHT / 2)
 		self.oldPos = self.pos
 		self.vel = Vector(0, 0)
+		self.oldAngle = 0
 		self.direction = 1
 
 		self.cursorAngle = 0
@@ -90,9 +91,12 @@ function Player:update(dt)
 	end
 
 	self.vel = Vector(0, 0)
+	if lsx ~= 0 or lsy ~= 0 then
+		self.oldAngle = math.atan2(lsy, lsx)
+	end
 	if self.cursorTimer == 0 and self.stunTimer == 0 then
 		if self:isSpiced() then
-			self.vel = self.vel + Vector(lsx, lsy) * Player.SPEED * 1.5
+			self.vel = Vector(math.cos(self.oldAngle), math.sin(self.oldAngle)) * Player.SPEED * 2
 		else
 			self.vel = self.vel + Vector(lsx, lsy) * Player.SPEED
 		end
