@@ -13,6 +13,7 @@ CONSTANTS = Class {
 	PLAYER_COIN_FIXTURE_GROUP = 1,
 	NUM_PLAYERS = 2,
 	MAX_COINS = 20,
+	HOOYAH = love.audio.newSource("sfx/hooyah.wav"),
 	SCORE_LABEL = 'Player %i: %i Sushi'
 }
 
