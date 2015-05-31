@@ -1,7 +1,29 @@
 Player = require 'player'
 ObjSpawner = require 'obj_spawner'
+Gamestate = require 'lib.gamestate'
 
-function love.load()
+
+local menu = {}
+local game = {}
+local pause = {}
+
+
+function menu:init()
+    font = love.graphics.getFont()
+    message = "Press Enter to continue"
+end
+
+function menu:draw()
+    love.graphics.print(message, love.window.getWidth()/2 - font:getWidth(message)/2, love.window.getHeight()/2 - font:getHeight(message)/2)
+end
+
+function menu:keyreleased(key, code)
+    if key == 'enter' or key == 'return' then
+        Gamestate.switch(game)
+    end
+end
+
+function game:enter()
 	math.randomseed(os.time())
 	love.graphics.setDefaultFilter('nearest', 'nearest')
 	love.graphics.setBackgroundColor(40, 60, 80)
@@ -22,20 +44,55 @@ function love.load()
 	objSpawner:addSpawn(OBJ_TYPE.COIN, 0.05)
 end
 
-function love.update(dt)
+function game:update(dt)
 	world:update(dt)
 	p1:update(dt)
 	p2:update(dt)
 	objSpawner:update(dt)
-	if love.keyboard.isDown('escape') then
-		love.event.push('quit')
-	end
 end
 
-function love.draw()
+function game:draw()
 	p1:draw()
 	p2:draw()
 	objSpawner:draw()
+end
+
+function game:keypressed(key, code)
+    if key == 'p' then
+        return Gamestate.push(pause)
+    end
+end
+
+function pause:enter(from)
+    self.from = from
+end
+
+function pause:draw()
+    local W, H = love.graphics.getWidth(), love.graphics.getHeight()
+    -- draw previous screen
+    self.from:draw()
+    -- overlay with pause message
+    love.graphics.setColor(0,0,0, 100)
+    love.graphics.rectangle('fill', 0,0, W,H)
+    love.graphics.setColor(255,255,255)
+    love.graphics.printf('PAUSE', 0, H/2, W, 'center')
+end
+
+function pause:keypressed(key)
+    if key == 'p' then
+        return Gamestate.pop()
+    end
+end
+
+function love.load()
+    Gamestate.registerEvents()
+    Gamestate.switch(menu)
+end
+
+function love.keypressed(key)
+	if key == 'escape' then
+    	love.event.push('quit')
+    end
 end
 
 function beginContact(a, b, coll)
@@ -46,41 +103,24 @@ function beginContact(a, b, coll)
 	local mine
 	local coin
 
-	if userDataA.type == OBJ_TYPE.PLAYER then
-		player = userDataA
-	elseif userDataA.type == OBJ_TYPE.MINE then
-		mine = userDataA
-	elseif userDataA.type == OBJ_TYPE.COIN then
-		coin = userDataA
-	end
+	if userDataA.type == OBJ_TYPE.PLAYER then player = userDataA
+	elseif userDataA.type == OBJ_TYPE.MINE then mine = userDataA
+	elseif userDataA.type == OBJ_TYPE.COIN then coin = userDataA end
 
-	if userDataB.type == OBJ_TYPE.PLAYER then
-		player = userDataB
-	elseif userDataB.type == OBJ_TYPE.MINE then
-		mine = userDataB
-	elseif userDataB.type == OBJ_TYPE.COIN then
-		coin = userDataB
-	end
+	if userDataB.type == OBJ_TYPE.PLAYER then player = userDataB
+	elseif userDataB.type == OBJ_TYPE.MINE then mine = userDataB
+	elseif userDataB.type == OBJ_TYPE.COIN then coin = userDataB end
 
 	if player and mine then
-		if player.id ~= mine.player.id then
-			print("PLAYER ", player.id, " TOUCHED ENEMY MINE ", mine.id)
-			mine:explode()
-		end
+		if player.id ~= mine.player.id then mine:explode() end
 	elseif player and coin then
 		player:collectCoin(coin)
 		objSpawner:deleteItem(coin)
 	end
 end
 
-function endContact(a, b, coll)
+function endContact(a, b, coll) end
 
-end
+function preSolve(a, b, coll) end
 
-function preSolve(a, b, coll)
-
-end
-
-function postSolve(a, b, coll, normalimpulse1, tangentimpulse1, normalimpulse2, tangentimpulse2)
-
-end
+function postSolve(a, b, coll, normalimpulse1, tangentimpulse1, normalimpulse2, tangentimpulse2) end

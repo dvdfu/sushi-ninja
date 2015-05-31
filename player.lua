@@ -61,23 +61,15 @@ function Player:update(dt)
 	local rsx, rsy = self.controller:RSX(), self.controller:RSY()
 
 	self.vel = Vector(0, 0)
-	if self.cursorTimer == 0 then
-		self.vel = self.vel + Vector(self.controller:LSX(), self.controller:LSY()) * Player.SPEED
-	end
+	if self.cursorTimer == 0 then self.vel = self.vel + Vector(self.controller:LSX(), self.controller:LSY()) * Player.SPEED end
 
-	if self.vel:len() > 0 then
-		self.anim = self.runAnim
-	else
-		self.anim = self.idleAnim
-	end
-	if self.vel.x > 0 then
-		self.direction = 1
-	elseif self.vel.x < 0 then
-		self.direction = -1
-	end
+	if self.vel:len() > 0 then self.anim = self.runAnim
+	else self.anim = self.idleAnim end
 
-	if self.hurtTimer > 0 then
-		self.hurtTimer = self.hurtTimer - dt
+	if self.vel.x > 0 then self.direction = 1
+	elseif self.vel.x < 0 then self.direction = -1 end
+
+	if self.hurtTimer > 0 then self.hurtTimer = self.hurtTimer - dt
 	else
 		self.body:setLinearVelocity(self.vel:unpack())
 		self.pos = Vector(self.body:getX(), self.body:getY())
@@ -85,27 +77,20 @@ function Player:update(dt)
 	end
 
 	--cursor logic
-	if self.cursorTimer > 0 then
-		self.cursorTimer = self.cursorTimer - dt
-	else
-		self.cursorTimer = 0
-	end
+	if self.cursorTimer > 0 then self.cursorTimer = self.cursorTimer - dt
+	else self.cursorTimer = 0 end
 
 	if self.cursor then
 		self.cursorVelocity = self.cursorVelocity * 0.97
 		self.cursorRadius = self.cursorRadius + self.cursorVelocity
 
  		local angle = math.atan2(rsy, rsx)
- 	    if self.cursorLastAngle < -2.0 and angle > 2.0 then
-	        self.cursorAngle = self.cursorAngle + (math.pi*2.0)
- 	    elseif self.cursorLastAngle > 2.0 and angle < -2.0 then
-	        self.cursorAngle = self.cursorAngle - math.pi * 2.0
- 	    end
+ 	    if self.cursorLastAngle < -2.0 and angle > 2.0 then self.cursorAngle = self.cursorAngle + (math.pi*2.0)
+ 	    elseif self.cursorLastAngle > 2.0 and angle < -2.0 then self.cursorAngle = self.cursorAngle - math.pi * 2.0 end
  	    self.cursorLastAngle = angle
      	self.cursorAngle = (angle*Player.ROTATION_FACTOR) + (self.cursorAngle*(1.0 - Player.ROTATION_FACTOR))
 
-		if rsx == 0 and rsy == 0 then
-			self.cursor = false
+		if rsx == 0 and rsy == 0 then self.cursor = false
 		elseif self.controller:RB() then
 			self.cursor = false
 			self.cursorTimer = Player.BLUR_TIMEOUT
@@ -133,15 +118,10 @@ function Player:draw()
 		love.graphics.circle('line', self.pos.x + cursorPos.x, self.pos.y + cursorPos.y, 16)
 	end
 
-	if self.id == 1 then
-		love.graphics.setColor(255, 255, 0)
-	else
-		love.graphics.setColor(0, 255, 255)
-	end
+	if self.id == 1 then love.graphics.setColor(255, 255, 0)
+	else love.graphics.setColor(0, 255, 255) end
 
-	if self.cursorTimer > 0 then
-		love.graphics.draw(Player.BLUR_SPR, self.oldPos.x, self.oldPos.y, self.cursorAngle, (self.cursorRadius + 16) / 128, 2, 0, 16)
-	end
+	if self.cursorTimer > 0 then love.graphics.draw(Player.BLUR_SPR, self.oldPos.x, self.oldPos.y, self.cursorAngle, (self.cursorRadius + 16) / 128, 2, 0, 16) end
 
 	self.anim:draw(self.body:getX(), self.body:getY(), 0, 2 * self.direction, 2, 16, 16)
 	love.graphics.setColor(255, 255, 255)
@@ -149,9 +129,7 @@ end
 
 function Player:dropMine()
 	self.minesCount = self.minesCount + 1
-	if self.minesCount > 5 then
-		self.mines[5]:explode()
-	end
+	if self.minesCount > 5 then self.mines[5]:explode() end
 	table.insert(self.mines, 1, Mine(1, self.pos.x, self.pos.y, self))
 	for key, mine in pairs(self.mines) do mine:setId(key) end
 end
