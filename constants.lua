@@ -10,7 +10,8 @@ CONSTANTS = Class {
 	DEFAULT_MAX_ITEMS_ON_SCREEN = 1000, -- of a given object
 	PLAYER_COIN_FIXTURE_GROUP = 1,
 	NUM_PLAYERS = 2,
-	MAX_COINS = 20,
+	MAX_COINS = 1,
+	HOOYAH = love.audio.newSource("sfx/hooyah.wav"),
 	SCORE_LABEL = 'Player %i: %i Sushi'
 }
 

@@ -12,6 +12,8 @@ local game = {}
 local pause = {}
 local over = {}
 
+local winTimer = 0
+
 function menu:draw()
     love.graphics.setColor(255,255,255)
     love.graphics.printf("Press START to play!", 0, CONSTANTS.SCREEN_HEIGHT/2, CONSTANTS.SCREEN_WIDTH, 'center')
@@ -30,6 +32,10 @@ function menu:joystickreleased(key, code)
 end
 
 function game:enter()
+	CONSTANTS.HOOYAH:stop()
+	CONSTANTS.HOOYAH:play()
+	love.audio.rewind()
+	love.audio.resume()
 	SUSHI_PLATE = love.graphics.newImage('img/sushi_plate.png')
 	SUSHI_COUNTER = love.graphics.newImage('img/sushi_counter.png')
 	TATAMI = love.graphics.newImage('img/tatami.png')
@@ -150,12 +156,12 @@ function game:joystickpressed(key, code)
 	end
 end
 
-function game:remove()
-	objSpawner:clearAll()
+function game:leave()
 end
 
 function pause:enter(from)
     self.from = from
+    love.audio.pause()
 end
 
 function pause:draw()
@@ -174,11 +180,15 @@ end
 
 function pause:joystickpressed(key, code)
 	if code == 9 then
+		love.audio.resume()
         return Gamestate.pop()
 	end
 end
 
 function over:enter(to, winner, from)
+	CONSTANTS.HOOYAH:stop()
+	CONSTANTS.HOOYAH:play()
+	love.audio.pause()
 	self.from = from
 	local color = ""
     if winner == 1 then
@@ -187,14 +197,26 @@ function over:enter(to, winner, from)
     	color = "Blue"
     end
     message = color .. " is the ultimate sushi ninja!\nPress start to duel again."
+    winTimer = 0.5
+end
+
+function over:update(dt)
+	if winTimer > 0 then
+		self.from:update(dt)
+		winTimer = winTimer - dt
+	else
+		winTimer = 0
+	end
 end
 
 function over:draw()
     self.from:draw()
-    love.graphics.setColor(0,0,0, 100)
-    love.graphics.rectangle('fill', 0,0, CONSTANTS.SCREEN_WIDTH,CONSTANTS.SCREEN_HEIGHT)
-    love.graphics.setColor(255,255,255)
-    love.graphics.printf(message, 0, CONSTANTS.SCREEN_HEIGHT/2, CONSTANTS.SCREEN_WIDTH, 'center')
+    if winTimer == 0 then
+	    love.graphics.setColor(0,0,0, 100)
+	    love.graphics.rectangle('fill', 0,0, CONSTANTS.SCREEN_WIDTH,CONSTANTS.SCREEN_HEIGHT)
+	    love.graphics.setColor(255,255,255)
+	    love.graphics.printf(message, 0, CONSTANTS.SCREEN_HEIGHT*3/4, CONSTANTS.SCREEN_WIDTH, 'center')
+    end
 end
 
 -- function over:keyreleased(key, code)
@@ -213,6 +235,10 @@ function love.load()
 	math.randomseed(os.time())
 	love.graphics.setNewFont('assets/babyblue.ttf', 64)
 	love.graphics.setBackgroundColor(60, 40, 30)
+	bgm = love.audio.newSource("sfx/tsugaru_shamisen.wav", "stream")
+	bgm:setLooping( true )
+	love.audio.play(bgm)
+	love.audio.pause()
     Gamestate.registerEvents()
     Gamestate.switch(menu)
 end
