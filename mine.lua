@@ -2,7 +2,7 @@ Class = require 'lib.class'
 Vector = require 'lib.vector'
 
 Mine = Class{
-	KNOCK_BACK = 5,
+	KNOCK_BACK = 10,
 	DANGER_PROXIMITY = 100,
 	init = function(self, id, x, y, player)
 		self.type = OBJ_TYPE.MINE
@@ -11,7 +11,7 @@ Mine = Class{
 		self.player = player
 
 		self.body = love.physics.newBody(world, self.pos.x, self.pos.y, 'kinematic')
-		self.shape = love.physics.newCircleShape(36)
+		self.shape = love.physics.newCircleShape(32)
 		self.fixture = love.physics.newFixture(self.body, self.shape, 0)
 		self.fixture:setUserData(self)
 		self.fixture:setCategory(self.player.id)
@@ -24,7 +24,7 @@ end
 
 function Mine:draw()
   love.graphics.setColor(0, 0, 0, 255)
-  love.graphics.circle('fill', self.body:getX(), self.body:getY(), self.shape:getRadius())
+  love.graphics.circle('line', self.body:getX(), self.body:getY(), self.shape:getRadius())
   love.graphics.setColor(255, 255, 255, 255)
 end
 
