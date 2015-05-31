@@ -61,11 +61,6 @@ function game:update(dt)
 	p1:update(dt)
 	p2:update(dt)
 	objSpawner:update(dt)
-	if p1.coins >= CONSTANTS.MAX_COINS then
-		Gamestate.switch(over, p1.id)
-	elseif p2.coins >= CONSTANTS.MAX_COINS then
-		Gamestate.switch(over, p2.id)
-	end
 end
 
 function game:draw()
@@ -97,6 +92,10 @@ function game:joystickpressed(key, code)
 	if code == 9 then
         return Gamestate.push(pause)
 	end
+end
+
+function game:remove()
+	objSpawner:clear()
 end
 
 function pause:enter(from)
@@ -179,7 +178,9 @@ function beginContact(a, b, coll)
 	if player and mine then
 		if player.id ~= mine.player.id then mine:explode() end
 	elseif player and coin then
-		player:collectCoin(coin)
+		if player:collectCoin(coin) >= CONSTANTS.MAX_COINS then
+			Gamestate.switch(over, player.id)
+		end
 		objSpawner:deleteItem(coin)
 	end
 end
