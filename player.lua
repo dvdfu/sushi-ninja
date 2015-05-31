@@ -106,7 +106,7 @@ function Player:update(dt)
 		if (rsx == 0 and rsy == 0) or self.stunTimer > 0  then
 			self.cursor = false
 			self.cursorRadius = 0
-		elseif self.controller:RB() then --on dash
+		elseif self.controller:RB() or self.controller:LB() then --on dash
 			Player.DASH_SFX:stop()
 			Player.DASH_SFX:play()
 			self.cursor = false
@@ -115,14 +115,14 @@ function Player:update(dt)
 			self.body:setPosition((self.pos + self.cursorRadius * Vector(math.cos(self.cursorAngle), math.sin(self.cursorAngle))):unpack())
 		end
 	else
-		if self.cursorTimer == 0 and not self.controller:RB() and (rsx ~= 0 or rsy ~= 0) and self.stunTimer == 0  then
+		if self.cursorTimer == 0 and not (self.controller:RB() or self.controller:LB()) and (rsx ~= 0 or rsy ~= 0) and self.stunTimer == 0  then
 			self.cursor = true
 			self.cursorRadius = 0
 			self.cursorVelocity = 10
 		end
 	end
 
-	if love.timer.getTime() - self.preT > 0.5 and self.controller:RT() == 1 and self.stunTimer == 0  then
+	if love.timer.getTime() - self.preT > 0.5 and (self.controller:RT() == 1 or self.controller:LT() == 1)and self.stunTimer == 0  then
 		self:dropMine()
 		self.preT = love.timer.getTime()
 	end

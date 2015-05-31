@@ -23,17 +23,20 @@ Coin = Class {
 		Coin.iniId = Coin.iniId + 1
 
 		-- Coin Physics
-		self.body = love.physics.newBody(world, self.pos.x, self.pos.y, 'static')
+		self.body = love.physics.newBody(world, self.pos.x, self.pos.y, 'kinematic')
 		self.shape = love.physics.newCircleShape(Coin.RADIUS)
 		self.fixture = love.physics.newFixture(self.body, self.shape)
 		self.fixture:setUserData(self)
 		self.fixture:setGroupIndex(CONSTANTS.PLAYER_COIN_FIXTURE_GROUP)
+
+		partSmoke:setPosition(self.pos:unpack())
+		partSmoke:emit(40)
 	end
 }
 
 function Coin:update(dt)
 	if self.timer < 1 then
-		self.timer = self.timer + dt
+		self.timer = self.timer + dt*0.7
 	else
 		self.timer = self.timer - 1
 	end
@@ -49,6 +52,8 @@ end
 function Coin:delete()
 	Coin.PICKUP_SFX:stop()
 	Coin.PICKUP_SFX:play()
+	partSparkle:setPosition(self.pos:unpack())
+	partSparkle:emit(20)
 	self.body:destroy()
 end
 
