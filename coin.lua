@@ -4,9 +4,8 @@ Vector = require 'lib.vector'
 Coin = Class {
 	RADIUS = 5,
 	INI_ID = 1,
-	OBJ_TYPE = 'COIN',
 	init = function(self, pos)
-		self.TYPE = Coin.OBJ_TYPE
+		self.type = OBJ_TYPE.COIN
 		self.pos = pos
 		self.id = Coin.INI_ID
 		Coin.INI_ID = Coin.INI_ID + 1
@@ -28,6 +27,10 @@ function Coin:draw()
 	love.graphics.setColor(255, 255, 0)
 	love.graphics.circle('line', self.pos.x, self.pos.y, Coin.RADIUS, 10)
 	love.graphics.setColor(255, 255, 255)
+end
+
+function Coin:delete()
+	self.body:destroy()
 end
 
 return Coin

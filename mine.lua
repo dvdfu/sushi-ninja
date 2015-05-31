@@ -3,7 +3,7 @@ Vector = require 'lib.vector'
 
 Mine = Class{
 	init = function(self, id, x, y, player)
-		self.type = 'MINE'
+		self.type = OBJ_TYPE.MINE
 		self.id = id
 		self.pos = Vector(x, y)
 		self.player = player
