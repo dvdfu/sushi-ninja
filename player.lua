@@ -245,7 +245,6 @@ end
 function Player:collectCoin()
 	if self:isSpiced() then return end
 	self.coins = self.coins + 1
-	-- print('Player ', self.id, ': ', self.coins, ' coins')
 	return self.coins
 end
 
