@@ -1,10 +1,12 @@
+require 'lib.anim'
 Class = require 'lib.class'
 Vector = require 'lib.vector'
 Controller = require 'controller'
 Mine = require 'mine'
 
 Player = Class {
-	SPEED = 500,
+	SPEED = 300,
+	IDLE_SPR = love.graphics.newImage('img/player_idle.png'),
 	BLUR_SPR = love.graphics.newImage('img/blur.png'),
 	BLUR_TIMEOUT = 1 / 20,
  	ROTATION_FACTOR = 0.15,
@@ -32,6 +34,8 @@ Player = Class {
 		self.fixture:setCategory(self.id)
 		self.fixture:setMask(self.id)
 
+ 		self.idleAnim = newAnimation(Player.IDLE_SPR, 32, 32, 0.4, 0)
+
 		Player.BLUR_SPR:setFilter('nearest', 'nearest')
 
 		self.mines = {}
@@ -43,7 +47,7 @@ Player = Class {
 }
 
 function Player:update(dt)
-	for i = 1, #self.mines do self.mines[i]:setId(i) end
+	self.idleAnim:update(dt)
 	local lsx, lsy = self.controller:LSX(), self.controller:LSY()
 	local rsx, rsy = self.controller:RSX(), self.controller:RSY()
 
@@ -62,7 +66,7 @@ function Player:update(dt)
 	end
 
 	if self.cursor then
-		self.cursorVelocity = self.cursorVelocity * 0.95
+		self.cursorVelocity = self.cursorVelocity * 0.97
 		self.cursorRadius = self.cursorRadius + self.cursorVelocity
 
  		local angle = math.atan2(rsy, rsx)
@@ -80,14 +84,13 @@ function Player:update(dt)
 			self.cursor = false
 			self.cursorTimer = Player.BLUR_TIMEOUT
 			self.oldPos = self.pos
-			-- self.pos = self.pos + self.cursorRadius * Vector(math.cos(self.cursorAngle), math.sin(self.cursorAngle))
 			self.body:setPosition((self.pos + self.cursorRadius * Vector(math.cos(self.cursorAngle), math.sin(self.cursorAngle))):unpack())
 		end
 	else
 		if self.cursorTimer == 0 and not self.controller:RB() and (rsx ~= 0 or rsy ~= 0) then
 			self.cursor = true
 			self.cursorRadius = 0
-			self.cursorVelocity = 16
+			self.cursorVelocity = 10
 		end
 	end
 
@@ -101,25 +104,16 @@ end
 
 function Player:draw()
 	for key, mine in pairs(self.mines) do mine:draw() end
-
-	love.graphics.circle("fill", self.body:getX(), self.body:getY(), self.shape:getRadius())
-
-	if self.cursorTimer > 0 then
-		love.graphics.setBlendMode('additive')
-		love.graphics.setColor(255, 255, 255, 255 * (self.cursorTimer / Player.BLUR_TIMEOUT))
-		love.graphics.draw(Player.BLUR_SPR, self.oldPos.x, self.oldPos.y, self.cursorAngle, (self.cursorRadius + 16) / 128, 1, 0, 16)
-		love.graphics.setColor(255, 255, 255, 255)
-		love.graphics.setBlendMode('alpha')
-	end
-
 	if self.cursor then
 		local cursorPos = self.cursorRadius * Vector(math.cos(self.cursorAngle), math.sin(self.cursorAngle))
 		love.graphics.circle('line', self.pos.x + cursorPos.x, self.pos.y + cursorPos.y, 16)
-		-- love.graphics.line(self.pos.x, self.pos.y, self.pos.x + cursorPos.x, self.pos.y + cursorPos.y)
-		-- love.graphics.circle('line', self.pos.x, self.pos.y, self.cursorRadius)
 	end
 
-	-- love.graphics.circle('fill', self.pos.x, self.pos.y, 16)
+	if self.cursorTimer > 0 then
+		love.graphics.draw(Player.BLUR_SPR, self.oldPos.x, self.oldPos.y, self.cursorAngle, (self.cursorRadius + 16) / 128, 1, 0, 16)
+	end
+
+	self.idleAnim:draw(self.body:getX(), self.body:getY(), 0, 1, 1, 16, 16)
 end
 
 function Player:dropMine()
