@@ -92,11 +92,12 @@ function menu:leave()
 	menuCoins = nil
 end
 
-function menu:keyreleased(key, code)
-    if key == 'enter' or key == 'return' then
-        Gamestate.switch(game)
-    end
-end
+-- ENABLE TO ALLOW ENTER KEY TO START GAME
+-- function menu:keyreleased(key, code)
+--     if key == 'enter' or key == 'return' then
+--         Gamestate.switch(game)
+--     end
+-- end
 
 function menu:joystickreleased(key, code)
 	if code == 9 then
@@ -131,6 +132,7 @@ function game:enter()
 	p2:setEnemy(p1)
 	objSpawner = ObjSpawner()
 	objSpawner:addSpawn(OBJ_TYPE.COIN, CONSTANTS.COIN_SPAWN_FREQUENCY, CONSTANTS.MAX_COINS_ON_SCREEN, nil)
+	objSpawner:addSpawn(OBJ_TYPE.WASABI, CONSTANTS.WASABI_SPAWN_FREQUENCY, CONSTANTS.MAX_WASABI_ON_SCREEN, nil)
 end
 
 function game:update(dt)
@@ -337,14 +339,17 @@ function beginContact(a, b, coll)
 	local player
 	local mine
 	local coin
+	local wasabi
 
 	if userDataA.type == OBJ_TYPE.PLAYER then player = userDataA
 	elseif userDataA.type == OBJ_TYPE.MINE then mine = userDataA
-	elseif userDataA.type == OBJ_TYPE.COIN then coin = userDataA end
+	elseif userDataA.type == OBJ_TYPE.COIN then coin = userDataA
+	elseif userDataA.type == OBJ_TYPE.WASABI then wasabi = userDataA end
 
 	if userDataB.type == OBJ_TYPE.PLAYER then player = userDataB
 	elseif userDataB.type == OBJ_TYPE.MINE then mine = userDataB
-	elseif userDataB.type == OBJ_TYPE.COIN then coin = userDataB end
+	elseif userDataB.type == OBJ_TYPE.COIN then coin = userDataB
+	elseif userDataB.type == OBJ_TYPE.WASABI then wasabi = userDataB end
 
 	if player and mine then
 		if player.id ~= mine.player.id then mine:explode(false) end
@@ -359,6 +364,9 @@ function beginContact(a, b, coll)
 			Gamestate.switch(over, message, game)
 		end
 		objSpawner:deleteItem(coin)
+	elseif player and wasabi then
+		player:eatSpice(CONSTANTS.SPICED_DURATION)
+		objSpawner:deleteItem(wasabi)
 	end
 end
 

@@ -8,19 +8,23 @@ CONSTANTS = Class {
 	Y_MARGIN = love.graphics.getHeight() * 0.05,
 	COIN_SPAWN_FREQUENCY = 1.5,
 	MAX_COINS_ON_SCREEN = 250,
+	WASABI_SPAWN_FREQUENCY = 5,
+	MAX_WASABI_ON_SCREEN = 6,
 	MIN_COIN_DIST2_FROM_PLAYER = 50000,
 	DEFAULT_MAX_ITEMS_ON_SCREEN = 1000, -- of a given object
-	PLAYER_COIN_FIXTURE_GROUP = 1,
+	PLAYER_INTERACTABLE_FIXTURE_GROUP = 1,
 	NUM_PLAYERS = 2,
 	MAX_COINS = 20,
 	HOOYAH = love.audio.newSource("sfx/hooyah.wav"),
-	SCORE_LABEL = 'Player %i: %i Sushi'
+	SCORE_LABEL = 'Player %i: %i Sushi',
+	SPICED_DURATION = 3
 }
 
 OBJ_TYPE = {
 	PLAYER = 'PLAYER',
 	MINE = 'MINE',
-	COIN = 'COIN'
+	COIN = 'COIN',
+	WASABI = 'WASABI'
 }
 
 P_COLOUR = {
