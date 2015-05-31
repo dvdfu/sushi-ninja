@@ -5,7 +5,10 @@ Coin = require 'coin'
 
 ObjSpawner = Class {
 	init = function(self)
-		self.xBound, self.yBound = love.graphics.getDimensions()
+		width = CONSTANTS.SCREEN_WIDTH
+		height = CONSTANTS.SCREEN_HEIGHT
+		self.xBound = width - CONSTANTS.X_MARGIN
+		self.yBound = height - CONSTANTS.Y_MARGIN
 		self.objsToSpawn = {}
 		self.spawner = {}
 		self.objSpawnerTimer = Timer.new()
@@ -30,8 +33,8 @@ end
 
 function ObjSpawner:spawnObj(objType)
 	-- Place randomly on map
-	local xPos = math.random() * self.xBound
-	local yPos = math.random() * self.yBound
+	local xPos = math.random() * self.xBound + (CONSTANTS.X_MARGIN / 2)
+	local yPos = math.random() * self.yBound + (CONSTANTS.Y_MARGIN / 2)
 	local objPos = Vector(xPos, yPos)
 	-- Determine which object to create.
 	if objType == OBJ_TYPE.COIN then

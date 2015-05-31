@@ -35,6 +35,7 @@ Player = Class {
 		self.fixture:setUserData(self)
 		self.fixture:setCategory(self.id)
 		self.fixture:setMask(self.id)
+		self.fixture:setGroupIndex(CONSTANTS.PLAYER_COIN_FIXTURE_GROUP)
 
 		Player.BLUR_SPR:setFilter('nearest', 'nearest')
 		Player.IDLE_SPR:setFilter('nearest', 'nearest')
