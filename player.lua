@@ -8,9 +8,12 @@ Player = Class {
 	SPEED = 300,
 	IDLE_SPR = love.graphics.newImage('img/player_idle.png'),
 	RUN_SPR = love.graphics.newImage('img/player_run.png'),
-	BLUR_SPR = love.graphics.newImage('img/blur.png'),
+	SHADOW_SPR = love.graphics.newImage('img/shadow.png'),
+	BLUR_SPR = love.graphics.newImage('img/blur2.png'),
 	BLUR_TIMEOUT = 1 / 20,
  	ROTATION_FACTOR = 0.15,
+ 	MAX_MINES = 3,
+	DASH_SFX = love.audio.newSource("sfx/dash.wav"),
 	init = function(self, playerNum)
 		self.type = OBJ_TYPE.PLAYER
 		self.id = playerNum
@@ -36,10 +39,6 @@ Player = Class {
 		self.fixture:setCategory(self.id)
 		self.fixture:setMask(self.id)
 		self.fixture:setGroupIndex(CONSTANTS.PLAYER_COIN_FIXTURE_GROUP)
-
-		Player.BLUR_SPR:setFilter('nearest', 'nearest')
-		Player.IDLE_SPR:setFilter('nearest', 'nearest')
-		Player.RUN_SPR:setFilter('nearest', 'nearest')
 
  		self.idleAnim = newAnimation(Player.IDLE_SPR, 32, 32, 0.4, 0)
  		self.runAnim = newAnimation(Player.RUN_SPR, 32, 32, 0.1, 0)
@@ -90,8 +89,12 @@ function Player:update(dt)
  	    self.cursorLastAngle = angle
      	self.cursorAngle = (angle*Player.ROTATION_FACTOR) + (self.cursorAngle*(1.0 - Player.ROTATION_FACTOR))
 
-		if rsx == 0 and rsy == 0 then self.cursor = false
-		elseif self.controller:RB() then
+		if rsx == 0 and rsy == 0 then
+			self.cursor = false
+			self.cursorRadius = 0
+		elseif self.controller:RB() then --on dash
+			Player.DASH_SFX:stop()
+			Player.DASH_SFX:play()
 			self.cursor = false
 			self.cursorTimer = Player.BLUR_TIMEOUT
 			self.oldPos = self.pos
@@ -143,40 +146,38 @@ end
 function Player:draw()
 	local sWidth, sHeight = CONSTANTS.SCREEN_WIDTH, CONSTANTS.SCREEN_HEIGHT
 
+	for key, mine in pairs(self.mines) do mine:draw() end
+
+	if self.id == 1 then love.graphics.setColor(255, 255, 0)
+	else love.graphics.setColor(0, 255, 255) end
+
 	self:drawOffset(0, 0)
-	if self.pos.x < sWidth / 2 then
-		self:drawOffset(sWidth, 0)
-	else
-		self:drawOffset(-sWidth, 0)
-	end
-	if self.pos.y < sHeight / 2 then
-		self:drawOffset(0, sHeight)
-	else
-		self:drawOffset(0, -sHeight)
-	end
+	self:drawOffset(sWidth, 0)
+	self:drawOffset(-sWidth, 0)
+	self:drawOffset(0, sHeight)
+	self:drawOffset(0, -sHeight)
+
+	love.graphics.setColor(255, 255, 255)
 end
 
 function Player:drawOffset(ox, oy)
 	local sWidth, sHeight = CONSTANTS.SCREEN_WIDTH, CONSTANTS.SCREEN_HEIGHT
 
-	for key, mine in pairs(self.mines) do mine:draw() end
 	if self.cursor then
 		local cursorPos = self.cursorRadius * Vector(math.cos(self.cursorAngle), math.sin(self.cursorAngle))
-		love.graphics.circle('line', self.pos.x + cursorPos.x + ox, self.pos.y + cursorPos.y + oy, 16)
+		love.graphics.draw(Player.SHADOW_SPR, self.pos.x + cursorPos.x + ox, self.pos.y + cursorPos.y + oy + 8, 0, 2, 2, 16, 16)
+	else
+		love.graphics.draw(Player.SHADOW_SPR, self.pos.x + ox, self.pos.y + oy + 8, 0, 2, 2, 16, 16)
 	end
-
-	if self.id == 1 then love.graphics.setColor(255, 255, 0)
-	else love.graphics.setColor(0, 255, 255) end
 
 	if self.cursorTimer > 0 then love.graphics.draw(Player.BLUR_SPR, self.oldPos.x + ox, self.oldPos.y + oy, self.cursorAngle, (self.cursorRadius + 16) / 128, 2, 0, 16) end
 
 	self.anim:draw(self.body:getX() + ox, self.body:getY() + oy, 0, 2 * self.direction, 2, 16, 16)
-	love.graphics.setColor(255, 255, 255)
 end
 
 function Player:dropMine()
 	self.minesCount = self.minesCount + 1
-	if self.minesCount > 5 then self.mines[5]:explode() end
+	if self.minesCount > Player.MAX_MINES then self.mines[Player.MAX_MINES]:explode() end
 	table.insert(self.mines, 1, Mine(1, self.pos.x, self.pos.y, self))
 	for key, mine in pairs(self.mines) do mine:setId(key) end
 end

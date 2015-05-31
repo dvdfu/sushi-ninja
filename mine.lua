@@ -2,8 +2,15 @@ Class = require 'lib.class'
 Vector = require 'lib.vector'
 
 Mine = Class{
-	KNOCK_BACK = 5,
-	DANGER_PROXIMITY = 100,
+	KNOCK_BACK = 20,
+	DANGER_PROXIMITY = 160,
+	SUSHI_SPR = {
+		love.graphics.newImage('img/sushi1.png'),
+		love.graphics.newImage('img/sushi2.png'),
+		love.graphics.newImage('img/sushi3.png')
+	},
+	EXPLOSION_SFX = love.audio.newSource("sfx/explosion.wav"),
+	PLANT_SFX = love.audio.newSource("sfx/mine.wav"),
 	init = function(self, id, x, y, player)
 		self.type = OBJ_TYPE.MINE
 		self.id = id
@@ -11,11 +18,15 @@ Mine = Class{
 		self.player = player
 
 		self.body = love.physics.newBody(world, self.pos.x, self.pos.y, 'kinematic')
-		self.shape = love.physics.newCircleShape(36)
+		self.shape = love.physics.newCircleShape(32)
 		self.fixture = love.physics.newFixture(self.body, self.shape, 0)
 		self.fixture:setUserData(self)
 		self.fixture:setCategory(self.player.id)
 		self.fixture:setMask(self.player.id)
+
+		self.sprite = Coin.SUSHI_SPR[math.random(#Coin.SUSHI_SPR)]
+		Mine.PLANT_SFX:stop()
+		Mine.PLANT_SFX:play()
 	end
 }
 
@@ -23,12 +34,17 @@ function Mine:update(dt)
 end
 
 function Mine:draw()
-  love.graphics.setColor(0, 0, 0, 255)
-  love.graphics.circle('fill', self.body:getX(), self.body:getY(), self.shape:getRadius())
-  love.graphics.setColor(255, 255, 255, 255)
+	love.graphics.setColor(0, 0, 0, 128)
+	love.graphics.draw(Coin.SHADOW_SPR, self.pos.x, self.pos.y+8, 0, 2, 2, 16, 16)
+	love.graphics.setColor(255, 255, 255, 255)
+	love.graphics.draw(self.sprite, self.pos.x, self.pos.y, 0, 2, 2, 16, 16)
 end
 
 function Mine:explode()
+	Mine.EXPLOSION_SFX:stop()
+	Mine.EXPLOSION_SFX:play()
+	particles:setPosition(self.pos:unpack())
+	particles:emit(40)
 	for key, mine in pairs(self.player.mines) do
 		if key == self.id then
 			local mine = table.remove(self.player.mines, key)

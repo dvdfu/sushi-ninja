@@ -1,13 +1,13 @@
+love.graphics.setDefaultFilter('nearest', 'nearest')
+
 Player = require 'player'
 ObjSpawner = require 'obj_spawner'
 Gamestate = require 'lib.gamestate'
 CONSTANTS = require 'constants'
 
-
 local menu = {}
 local game = {}
 local pause = {}
-
 
 function menu:init()
     font = love.graphics.getFont()
@@ -25,9 +25,17 @@ function menu:keyreleased(key, code)
 end
 
 function game:enter()
-	math.randomseed(os.time())
-	love.graphics.setDefaultFilter('nearest', 'nearest')
-	love.graphics.setBackgroundColor(40, 60, 80)
+	local particleSprite = love.graphics.newImage('img/particle.png')
+	particles = love.graphics.newParticleSystem(particleSprite, 300)
+	particles:setAreaSpread('normal', 30, 30)
+	particles:setParticleLifetime(0.1, 0.7)
+	particles:setDirection(-math.pi / 2)
+	particles:setSpread(math.pi / 3)
+	particles:setSpeed(0, 500)
+	particles:setColors(255, 255, 255, 255, 255, 255, 0, 255, 255, 30, 0, 128)
+	particles:setSizes(2, 0)
+	-- particles:setLinearAcceleration(0, 0, 0, 1000)
+
 	love.physics.setMeter(64)
 	world = love.physics.newWorld(0, 0, true)
     world:setCallbacks(beginContact, endContact, preSolve, postSolve)
@@ -42,6 +50,7 @@ end
 
 function game:update(dt)
 	world:update(dt)
+	particles:update(dt)
 	p1:update(dt)
 	p2:update(dt)
 	objSpawner:update(dt)
@@ -61,6 +70,9 @@ function game:draw()
 			CONSTANTS.X_MARGIN + ((p_id - 1) * CONSTANTS.SCREEN_WIDTH / 2),
 			CONSTANTS.SCREEN_HEIGHT - CONSTANTS.Y_MARGIN)
 	end
+	love.graphics.setBlendMode('additive')
+	love.graphics.draw(particles)
+	love.graphics.setBlendMode('alpha')
 end
 
 function game:keypressed(key, code)
@@ -91,6 +103,8 @@ function pause:keypressed(key)
 end
 
 function love.load()
+	math.randomseed(os.time())
+	love.graphics.setBackgroundColor(90, 80, 70)
     Gamestate.registerEvents()
     Gamestate.switch(menu)
 end

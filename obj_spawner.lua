@@ -47,6 +47,14 @@ end
 
 function ObjSpawner:update(dt)
 	self.objSpawnerTimer.update(dt)
+	-- Update spawned objects
+	for k, objs in pairs(self.objsToSpawn) do
+		for l, obj in pairs(objs) do
+			if obj ~= 0 then
+				self.objsToSpawn[k][l]:update(dt)
+			end
+		end
+	end
 end
 
 function ObjSpawner:draw()
