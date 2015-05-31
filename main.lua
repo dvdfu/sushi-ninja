@@ -15,9 +15,9 @@ local pause = {}
 local over = {}
 local winTimer = 0
 
-function menu:enter()
+function menu:enter(to)
 	font = love.graphics.getFont()
-	message = 'Press START to play!'
+	self.message = "Press START to play!"
 	sushiTimer = 0
 
 	idlePlayerAnim = newAnimation(Player.IDLE_SPR, 32, 32, 0.4, 0)
@@ -62,7 +62,8 @@ function menu:update(dt)
 end
 
 function menu:draw()
-	love.graphics.print(message, love.window.getWidth()/2 - font:getWidth(message)/2, love.window.getHeight()/2 - font:getHeight(message)/2)
+	love.graphics.printf(self.message, 0, CONSTANTS.SCREEN_HEIGHT/2, CONSTANTS.SCREEN_WIDTH, 'center')
+	-- love.graphics.print(self.message, love.window.getWidth()/2 - font:getWidth(self.message)/2, love.window.getHeight()/2 - font:getHeight(self.message)/2)
 	for i = 1, CONSTANTS.NUM_PLAYERS do
 		love.graphics.setColor(P_COLOUR[i].r, P_COLOUR[i].g, P_COLOUR[i].b)
 		idlePlayerAnim:draw((i * 2 - 1) * CONSTANTS.SCREEN_WIDTH / 4,
@@ -234,18 +235,12 @@ function pause:joystickpressed(key, code)
 	end
 end
 
-function over:enter(to, winner, from)
+function over:enter(to, message, from)
 	CONSTANTS.HOOYAH:stop()
 	CONSTANTS.HOOYAH:play()
 	love.audio.pause()
 	self.from = from
-	local color = ""
-    if winner == 1 then
-    	color = "Yellow"
-    else
-    	color = "Blue"
-    end
-    message = color .. " is the ultimate sushi ninja!\nPress start to duel again."
+	self.message = message
     winTimer = 0.5
 end
 
@@ -264,7 +259,7 @@ function over:draw()
 	    love.graphics.setColor(0,0,0, 100)
 	    love.graphics.rectangle('fill', 0,0, CONSTANTS.SCREEN_WIDTH,CONSTANTS.SCREEN_HEIGHT)
 	    love.graphics.setColor(255,255,255)
-	    love.graphics.printf(message, 0, CONSTANTS.SCREEN_HEIGHT*3/4, CONSTANTS.SCREEN_WIDTH, 'center')
+	    love.graphics.printf(self.message, 0, CONSTANTS.SCREEN_HEIGHT*3/4, CONSTANTS.SCREEN_WIDTH, 'center')
     end
 end
 
@@ -276,7 +271,7 @@ end
 
 function over:joystickreleased(key, code)
 	if code == 9 then
-        Gamestate.switch(game)
+        Gamestate.switch(menu)
 	end
 end
 
@@ -357,7 +352,13 @@ function beginContact(a, b, coll)
 		if player.id ~= mine.player.id then mine:explode(false) end
 	elseif player and coin and not player:isSpiced() then
 		if player:collectCoin(coin) >= CONSTANTS.MAX_COINS then
-			Gamestate.switch(over, player.id, game)
+			local message = ""
+		    if player.id == 1 then
+		    	message = "YELLOW is the ultimate sushi ninja!"
+		    else
+		    	message = "BLUE is the ultimate sushi ninja!"
+		    end
+			Gamestate.switch(over, message, game)
 		end
 		objSpawner:deleteItem(coin)
 	end
