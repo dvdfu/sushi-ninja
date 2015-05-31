@@ -49,7 +49,6 @@ function menu:update(dt)
 	for id in pairs(menuCoins) do
 		for i = 1, 20 do
 			direction = (id * 2) - 3
-			print('DIRECTION: ', direction)
 			menuCoins[id][i].pos.x = menuCoins[id][i].pos.x + (direction * 5)
 			if menuCoins[id][i].pos.x < 0 then
 				menuCoins[id][i].pos.x = menuCoins[id][i].pos.x + sWidth
@@ -63,7 +62,6 @@ end
 
 function menu:draw()
 	love.graphics.printf(self.message, 0, CONSTANTS.SCREEN_HEIGHT/2, CONSTANTS.SCREEN_WIDTH, 'center')
-	-- love.graphics.print(self.message, love.window.getWidth()/2 - font:getWidth(self.message)/2, love.window.getHeight()/2 - font:getHeight(self.message)/2)
 	for i = 1, CONSTANTS.NUM_PLAYERS do
 		love.graphics.setColor(P_COLOUR[i].r, P_COLOUR[i].g, P_COLOUR[i].b)
 		idlePlayerAnim:draw((i * 2 - 1) * CONSTANTS.SCREEN_WIDTH / 4,
