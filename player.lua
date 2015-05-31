@@ -8,8 +8,10 @@ Player = Class {
 	SPEED = 300,
 	IDLE_SPR = love.graphics.newImage('img/player_idle.png'),
 	RUN_SPR = love.graphics.newImage('img/player_run.png'),
+	STUN_SPR = love.graphics.newImage('img/player_stun.png'),
 	SHADOW_SPR = love.graphics.newImage('img/shadow.png'),
 	BLUR_SPR = love.graphics.newImage('img/blur2.png'),
+	STAR_SPR = love.graphics.newImage('img/star.png'),
 	BLUR_TIMEOUT = 1 / 20,
  	ROTATION_FACTOR = 0.15,
  	MAX_MINES = 3,
@@ -42,12 +44,15 @@ Player = Class {
 
  		self.idleAnim = newAnimation(Player.IDLE_SPR, 32, 32, 0.4, 0)
  		self.runAnim = newAnimation(Player.RUN_SPR, 32, 32, 0.1, 0)
+ 		self.stunAnim = newAnimation(Player.STUN_SPR, 32, 32, 0.8, 0)
  		self.anim = self.idleAnim
+ 		self.starAnim = newAnimation(Player.STAR_SPR, 10, 10, 0.2, 0)
 
 		self.mines = {}
 		self.minesCount = 0
 		self.preT = 0
 		self.hurtTimer = 0
+		self.stunTimer = 0
 
 		self.enemy = nil
 	end
@@ -55,15 +60,24 @@ Player = Class {
 
 function Player:update(dt)
 	self.anim:update(dt)
+	self.starAnim:update(dt)
 	local lsx, lsy = self.controller:LSX(), self.controller:LSY()
 	local rsx, rsy = self.controller:RSX(), self.controller:RSY()
 	local sWidth, sHeight = CONSTANTS.SCREEN_WIDTH, CONSTANTS.SCREEN_HEIGHT
 
+	--stunned
+	if self.stunTimer > 0 then
+		self.stunTimer = self.stunTimer - dt
+	else
+		self.stunTimer = 0
+	end
+
 	self.vel = Vector(0, 0)
-	if self.cursorTimer == 0 then self.vel = self.vel + Vector(lsx, lsy) * Player.SPEED end
+	if self.cursorTimer == 0 and self.stunTimer == 0 then self.vel = self.vel + Vector(lsx, lsy) * Player.SPEED end
 
 	if self.vel:len() > 0 then self.anim = self.runAnim
 	else self.anim = self.idleAnim end
+	if self.stunTimer > 0 then self.anim = self.stunAnim end
 
 	if self.vel.x > 0 then self.direction = 1
 	elseif self.vel.x < 0 then self.direction = -1 end
@@ -89,7 +103,7 @@ function Player:update(dt)
  	    self.cursorLastAngle = angle
      	self.cursorAngle = (angle*Player.ROTATION_FACTOR) + (self.cursorAngle*(1.0 - Player.ROTATION_FACTOR))
 
-		if rsx == 0 and rsy == 0 then
+		if (rsx == 0 and rsy == 0) or self.stunTimer > 0  then
 			self.cursor = false
 			self.cursorRadius = 0
 		elseif self.controller:RB() then --on dash
@@ -101,18 +115,17 @@ function Player:update(dt)
 			self.body:setPosition((self.pos + self.cursorRadius * Vector(math.cos(self.cursorAngle), math.sin(self.cursorAngle))):unpack())
 		end
 	else
-		if self.cursorTimer == 0 and not self.controller:RB() and (rsx ~= 0 or rsy ~= 0) then
+		if self.cursorTimer == 0 and not self.controller:RB() and (rsx ~= 0 or rsy ~= 0) and self.stunTimer == 0  then
 			self.cursor = true
 			self.cursorRadius = 0
 			self.cursorVelocity = 10
 		end
 	end
 
-	if love.timer.getTime() - self.preT > 0.5 and self.controller:RT() == 1 then
+	if love.timer.getTime() - self.preT > 0.5 and self.controller:RT() == 1 and self.stunTimer == 0  then
 		self:dropMine()
 		self.preT = love.timer.getTime()
 	end
-
 
 	-- KEYBOARD CONTROLS: UNCOMMENT TO USE
 	-- if love.keyboard.isDown('w') then
@@ -148,19 +161,17 @@ function Player:draw()
 
 	for key, mine in pairs(self.mines) do mine:draw() end
 
-	if self.id == 1 then love.graphics.setColor(255, 255, 0)
-	else love.graphics.setColor(0, 255, 255) end
-
 	self:drawOffset(0, 0)
 	self:drawOffset(sWidth, 0)
 	self:drawOffset(-sWidth, 0)
 	self:drawOffset(0, sHeight)
 	self:drawOffset(0, -sHeight)
-
-	love.graphics.setColor(255, 255, 255)
 end
 
 function Player:drawOffset(ox, oy)
+	if self.id == 1 then love.graphics.setColor(255, 255, 0)
+	else love.graphics.setColor(0, 255, 255) end
+
 	local sWidth, sHeight = CONSTANTS.SCREEN_WIDTH, CONSTANTS.SCREEN_HEIGHT
 
 	if self.cursor then
@@ -171,13 +182,24 @@ function Player:drawOffset(ox, oy)
 	end
 
 	if self.cursorTimer > 0 then love.graphics.draw(Player.BLUR_SPR, self.oldPos.x + ox, self.oldPos.y + oy, self.cursorAngle, (self.cursorRadius + 16) / 128, 2, 0, 16) end
-
 	self.anim:draw(self.body:getX() + ox, self.body:getY() + oy, 0, 2 * self.direction, 2, 16, 16)
+
+	love.graphics.setColor(255, 255, 255)
+
+	if self.stunTimer > 0 then
+		for i = 0, 4 do
+			local angle = self.stunTimer * math.pi * 2 + math.pi * 2 * i / 5
+			local x, y = 32 * math.cos(angle), 16 * math.sin(angle)
+			self.starAnim:draw(self.body:getX() + x + ox, self.body:getY() - 48 + y + oy, 0, 2, 2, 5, 5)
+		end
+	end
 end
 
 function Player:dropMine()
 	self.minesCount = self.minesCount + 1
-	if self.minesCount > Player.MAX_MINES then self.mines[Player.MAX_MINES]:explode() end
+	if self.minesCount > Player.MAX_MINES then
+		self.mines[Player.MAX_MINES]:explode(true)
+	end
 	table.insert(self.mines, 1, Mine(1, self.pos.x, self.pos.y, self))
 	for key, mine in pairs(self.mines) do mine:setId(key) end
 end
@@ -198,6 +220,10 @@ end
 
 function Player:getCoins()
 	return self.coins
+end
+
+function Player:stun()
+	if self.stunTimer == 0 then self.stunTimer = 2 end
 end
 
 return Player

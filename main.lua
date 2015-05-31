@@ -132,7 +132,7 @@ function beginContact(a, b, coll)
 	elseif userDataB.type == OBJ_TYPE.COIN then coin = userDataB end
 
 	if player and mine then
-		if player.id ~= mine.player.id then mine:explode() end
+		if player.id ~= mine.player.id then mine:explode(false) end
 	elseif player and coin then
 		player:collectCoin(coin)
 		objSpawner:deleteItem(coin)
