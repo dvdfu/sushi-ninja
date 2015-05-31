@@ -27,6 +27,7 @@ Coin = Class {
 		self.shape = love.physics.newCircleShape(Coin.RADIUS)
 		self.fixture = love.physics.newFixture(self.body, self.shape)
 		self.fixture:setUserData(self)
+		self.fixture:setSensor(true)
 		self.fixture:setGroupIndex(CONSTANTS.PLAYER_COIN_FIXTURE_GROUP)
 
 		partSmoke:setPosition(self.pos:unpack())

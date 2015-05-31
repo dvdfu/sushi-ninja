@@ -35,6 +35,7 @@ Player = Class {
 		self.controller = Controller(playerNum)
 
 		self.body = love.physics.newBody(world, self.pos.x, self.pos.y, 'dynamic')
+		self.body:setMass(10000)
 		self.shape = love.physics.newCircleShape(32)
 		self.fixture = love.physics.newFixture(self.body, self.shape)
 		self.fixture:setUserData(self)
@@ -210,7 +211,7 @@ end
 
 function Player:collectCoin()
 	self.coins = self.coins + 1
-	print('Player ', self.id, ': ', self.coins, ' coins')
+	-- print('Player ', self.id, ': ', self.coins, ' coins')
 	return self.coins
 end
 
