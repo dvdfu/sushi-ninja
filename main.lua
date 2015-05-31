@@ -1,5 +1,6 @@
 Player = require 'player'
 ObjSpawner = require 'obj_spawner'
+Vector = require 'lib.vector'
 
 function love.load()
 	math.randomseed(os.time())
@@ -11,7 +12,8 @@ function love.load()
 
 	p1 = Player(1)
 	p2 = Player(2)
-	c = Controller(1)
+	p1:setEnemy(p2)
+	p2:setEnemy(p1)
 	objSpawner = ObjSpawner()
 	objSpawner:addSpawn('COIN', 3)
 end
