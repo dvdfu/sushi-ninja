@@ -73,7 +73,7 @@ function menu:draw()
 	for i = 1, CONSTANTS.NUM_PLAYERS do
 		love.graphics.setColor(P_COLOUR[i].r, P_COLOUR[i].g, P_COLOUR[i].b)
 		idlePlayerAnim:draw(CONSTANTS.SCREEN_WIDTH/2 + ((i-1) * 2 - 1) * CONSTANTS.SCREEN_WIDTH / 3,
-			CONSTANTS.SCREEN_HEIGHT / 2, 0, 2, 2, 16, 16)
+			CONSTANTS.SCREEN_HEIGHT / 2, 0, 2 * (3-i*2), 2, 16, 16)
 	end
 
 	for id in pairs(menuCoins) do
