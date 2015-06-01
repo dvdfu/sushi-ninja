@@ -15,9 +15,10 @@ CONSTANTS = Class {
 	PLAYER_INTERACTABLE_FIXTURE_GROUP = 1,
 	NUM_PLAYERS = 2,
 	MAX_COINS = 20,
-	HOOYAH = love.audio.newSource("sfx/hooyah.wav"),
+	SPICED_DURATION = 3,
 	SCORE_LABEL = 'Player %i: %i Sushi',
-	SPICED_DURATION = 3
+	MENU_SUSHI_OFFSET = 64,
+	HOOYAH = love.audio.newSource("sfx/hooyah.wav"),
 }
 
 OBJ_TYPE = {
