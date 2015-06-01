@@ -51,7 +51,7 @@ function menu:update(dt)
 		for i = 1, 20 do
 			local offset = CONSTANTS.MENU_SUSHI_OFFSET
 			direction = (id * 2) - 3
-			menuCoins[id][i].pos.x = menuCoins[id][i].pos.x + (direction * 1)
+			menuCoins[id][i].pos.x = menuCoins[id][i].pos.x + (direction * 3)
 			if menuCoins[id][i].pos.x < -(offset / 2) then
 				menuCoins[id][i].pos.x = menuCoins[id][i].pos.x + sWidth + offset
 			elseif menuCoins[id][i].pos.x > sWidth + (offset / 2) then
