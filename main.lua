@@ -27,7 +27,7 @@ function menu:enter(to)
 	for i = 1, 20 do
 		for id in pairs(menuCoins) do
 			local sprite = Coin.SUSHI_SPR[math.random(#Coin.SUSHI_SPR)]
-			local posX = i * sWidth / 20
+			local posX = i * (sWidth + CONSTANTS.MENU_SUSHI_OFFSET) / 20
 			local posY = sHeight/2+((id-1) * 2 - 1) * sHeight *2/5
 			spriteData = {
 				spr = sprite,
@@ -49,12 +49,13 @@ function menu:update(dt)
 
 	for id in pairs(menuCoins) do
 		for i = 1, 20 do
+			local offset = CONSTANTS.MENU_SUSHI_OFFSET
 			direction = (id * 2) - 3
-			menuCoins[id][i].pos.x = menuCoins[id][i].pos.x + (direction * 5)
-			if menuCoins[id][i].pos.x < 0 then
-				menuCoins[id][i].pos.x = menuCoins[id][i].pos.x + sWidth
-			elseif menuCoins[id][i].pos.x > sWidth then
-				menuCoins[id][i].pos.x = menuCoins[id][i].pos.x - sWidth
+			menuCoins[id][i].pos.x = menuCoins[id][i].pos.x + (direction * 3)
+			if menuCoins[id][i].pos.x < -(offset / 2) then
+				menuCoins[id][i].pos.x = menuCoins[id][i].pos.x + sWidth + offset
+			elseif menuCoins[id][i].pos.x > sWidth + (offset / 2) then
+				menuCoins[id][i].pos.x = menuCoins[id][i].pos.x - sWidth - offset
 			end
 		end
 	end
