@@ -128,7 +128,7 @@ function game:enter()
 
 	--camera
 	camShake = 0
-	cam = Camera(love.window.getWidth()/2, love.window.getHeight()/2)
+	cam = Camera(love.graphics.getWidth()/2, love.graphics.getHeight()/2)
 
 	love.physics.setMeter(64)
 	world = love.physics.newWorld(0, 0, true)
@@ -156,7 +156,7 @@ function game:update(dt)
 		cam:lookAt(love.window.getWidth()/2 + math.random(-1,1)*camShake*32, love.window.getHeight()/2 + math.random(-1,1)*camShake*32)
 		camShake = camShake - dt
 	else
-		cam:lookAt(love.window.getWidth()/2, love.window.getHeight()/2)
+		cam:lookAt(love.graphics.getWidth()/2, love.graphics.getHeight()/2)
 		camShake = 0
 	end
 end
@@ -178,7 +178,7 @@ function game:draw()
 
 	love.graphics.draw(partSmoke)
 	love.graphics.draw(partSparkle)
-	love.graphics.setBlendMode('additive')
+	love.graphics.setBlendMode('add')
 	love.graphics.draw(partExplosion)
 	love.graphics.setBlendMode('alpha')
 
@@ -287,9 +287,6 @@ function love.load()
 	math.randomseed(os.time())
 	love.graphics.setNewFont('assets/babyblue.ttf', 32)
 	love.graphics.setBackgroundColor(60, 40, 30)
-	bgm = love.audio.newSource("sfx/tsugaru_shamisen.wav", "stream")
-	bgm:setLooping( true )
-	love.audio.play(bgm)
 	love.audio.pause()
     Gamestate.registerEvents()
     Gamestate.switch(menu)
