@@ -153,7 +153,8 @@ function game:update(dt)
 	p2:update(dt)
 	objSpawner:update(dt)
 	if camShake > 0 then
-		cam:lookAt(love.window.getWidth()/2 + math.random(-1,1)*camShake*32, love.window.getHeight()/2 + math.random(-1,1)*camShake*32)
+		width, height, flags = love.window.getMode()
+		cam:lookAt(width/2 + math.random(-1,1)*camShake*32, height/2 + math.random(-1,1)*camShake*32)
 		camShake = camShake - dt
 	else
 		cam:lookAt(love.graphics.getWidth()/2, love.graphics.getHeight()/2)
